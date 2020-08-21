@@ -1,0 +1,10 @@
+.idea
+__init__.py
+__pycache__
+bin
+include
+lib
+lib64
+pyvenv.cfg
+config.py
+tebear-aws-key-pair.pem
