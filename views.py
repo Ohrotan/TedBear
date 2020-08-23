@@ -32,15 +32,21 @@ def shadowing():
     return render_template(
         'shadowing.html'
     )
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    """Renders the contact page."""
-    return render_template(
-        'login.html',
-        title='Contact',
-        year=datetime.now().year,
-        message='Your contact page.'
-    )
+    if request.method == 'POST':
+        email = request.form['remail']
+        pwd = request.form['rpwd']
+        app.database.execute('SELECT * FROM user WHERE email == ?, pwd == ?').fetchall()
+        return render_template('')
+
+    if request.method == 'GET':
+        return render_template(
+            'login.html',
+            title='Contact',
+            year=datetime.now().year,
+            message='Your contact page.'
+        )
 
 @app.route('/register')
 def register():
