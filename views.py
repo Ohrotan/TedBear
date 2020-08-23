@@ -6,24 +6,39 @@ from datetime import datetime
 from flask import render_template
 from init import app
 from jinja2 import Template
-
+import ast
 from flask import Flask, jsonify, request
 from sqlalchemy import create_engine, text
 
 @app.route('/')
 @app.route('/home')
 def home():
-    print(app.database.execute('SELECT * FROM user').fetchall())
+    originlist=app.database.execute('SELECT topics,title,speaker,image,description FROM talks limit 6').fetchall()
+    sqllist=[]
+    for i in originlist:
+        i=list(i)
+        i[0]=ast.literal_eval(i[0])
+        sqllist.append(i)
     """Renders the home page."""
     return render_template(
         'home.html',
-        title='Home Page'
+        title='Home Page',
+        sqllist=sqllist
     )
 @app.route('/history')
 def history():
+
+    originlist = app.database.execute('SELECT a.talks_title,a.last_time,b.topics,b.speaker,b.image,b.duration FROM watching_record as a join talks as b on b.id=a.talks_id '
+                                      'where a.user_id=%s',(82)).fetchall()
+    sqllist = []
+    for i in originlist:
+        i=list(i)
+        i[2] = ast.literal_eval(i[2])
+        sqllist.append(i)
+        print(i[1],i[5])
     """Renders the home page."""
     return render_template(
-        'history.html'
+        'history.html',sqllist=sqllist
     )
 @app.route('/shadowing')
 def shadowing():
@@ -35,10 +50,17 @@ def shadowing():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
+        msg = ''
         email = request.form['remail']
         pwd = request.form['rpwd']
-        app.database.execute('SELECT * FROM user WHERE email == ?, pwd == ?').fetchall()
-        return render_template('')
+        print(email,pwd)
+        account = app.database.execute("SELECT * FROM user WHERE email =%s and pwd =%s",(email,pwd)).fetchall()
+        if account:
+            msg='success'
+            return render_template('home.html' )
+        else:
+            msg = 'Incorrect username/password!'
+            return render_template('login.html')
 
     if request.method == 'GET':
         return render_template(

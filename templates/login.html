@@ -9,7 +9,7 @@
                 <h2>Login</h2>
                 <!-- Request Form -->
                 <div>
-                    <form id="requestForm" data-toggle="validator" data-focus="false">
+                    <form id="requestForm" action="/login" method="post">
 
                         <div class="form-group">
                             <input type="email" class="form-control-input" id="remail" name="remail" required>
@@ -28,7 +28,8 @@
                             <button type="submit" class="form-control-submit-button">LOGIN</button>
                         </div>
                         <div class="form-group">
-                            <a class=" btn-solid-second page-scroll" href="./register.html" style="width: 100%;padding: 0;line-height: 3rem;">REGISTER</a>
+                            <a class=" btn-solid-second page-scroll" href="./register.html"
+                               style="width: 100%;padding: 0;line-height: 3rem;">REGISTER</a>
                         </div>
 
                     </form>
@@ -40,9 +41,6 @@
     </div> <!-- end of container -->
 </div> <!-- end of cards-2 -->
 <!-- end of pricing -->
-
-
-
 
 
 {% include 'footer.html' %}

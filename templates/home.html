@@ -1,170 +1,68 @@
 {% include 'header.html' %}
-{{ title }}
-    <!-- Videos -->
-    <div id="pricing" class="cards-2" style="padding-top: 8rem">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
+
+
+
+<!-- Videos -->
+<div id="pricing" class="cards-2" style="padding-top: 8rem">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
                 <form id="search-form" class="search-form">
                     <div class="form-group">
-                       <img class="search-img" src="static/images/search.png">
-                        <input type="text" class="form-control-input simple-input" id="search-keyword" placeholder="type to search">
+                        <img class="search-img" src="static/images/search.png">
+                        <input type="text" class="form-control-input simple-input" id="search-keyword"
+                               placeholder="type to search">
                     </div>
                 </form>
-                </div>
-            </div>  <h3>&nbsp;</h3>
-            <!--
-            <div class="row">
-                <div class="col-lg-12">
-                    <h2>See what you like!</h2>
-                    <p class="p-heading p-large">&nbsp;</p>
-                </div>
-            </div>  end of row -->
-            <div class="row">
-                <div class="col-lg-12">
+            </div>
+        </div>
+        <h3>&nbsp;</h3>
+        <!--
+        <div class="row">
+            <div class="col-lg-12">
+                <h2>See what you like!</h2>
+                <p class="p-heading p-large">&nbsp;</p>
+            </div>
+        </div>  end of row -->
+        <div class="row">
+            <div class="col-lg-12">
 
-                    <!-- Card-->
+                {{ sqllist.size }}
+                <!-- Card-->
+                {% for i in sqllist %}
                     <div class="card">
                         <div class="label">
-                            <p class="category">Creativity</p>
+                            <p class="category">{{ i[0][0] }}</p>
                         </div>
                         <div class="card-body">
-                            <div class="card-title ellipsis">Simple designs to save a life</div>
-                            <div class="card-subtitle">Amy Smith</div>
+                            <div class="card-title ellipsis">{{ i[1] }}</div>
+                            <div class="card-subtitle">{{ i[2] }}</div>
                             <hr class="cell-divide-hr">
                             <div class="price">
                                 <div class="video-wrapper">
                                     <div style="max-width:854px">
                                         <div style="position:relative;height:0;padding-bottom:56.25%;
-                                        background: url('https://pi.tedcdn.com/r/pe.tedcdn.com/images/ted/1451_480x360.jpg?w=1200');background-size: auto 100%;;">
-                                        </div></div>
+                                                background: url({{ i[3] }});background-size: auto 100%;;">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <hr class="cell-divide-hr">
                             <p class="ellipsis">
-                                Fumes from indoor cooking fires kill more than 2 million children a year in the developing world. MIT engineer Amy Smith details an exciting but simple solution: a tool for turning farm waste into clean-burning charcoal.
+                                {{ i[4] }}
                             </p>
                             <div class="button-wrapper">
                                 <a class="btn-solid-reg page-scroll" href="#request">WATCH</a>
                             </div>
                         </div>
                     </div> <!-- end of card -->
-                    <!-- end of card -->
-
-                    <!-- Card-->
-                    <div class="card">
-                        <div class="label">
-                            <p class="category">Creativity</p>
-                        </div>
-                        <div class="card-body">
-                            <div class="card-title ellipsis">Fake videos of real people — and how to spot them</div>
-                            <div class="card-subtitle">Very appropriate for the short term</div>
-                            <hr class="cell-divide-hr">
-                            <div class="price">
-                                <div class="video-wrapper">
-                                    <div style="max-width:854px">
-                                <div style="position:relative;height:0;padding-bottom:56.25%;
-                                        background: url('https://pi.tedcdn.com/r/pe.tedcdn.com/images/ted/1451_480x360.jpg?w=1200');background-size: auto 100%;;">
-                                </div></div>
-                                </div>
-                            </div>
-                            <hr class="cell-divide-hr">
-                            <p class="ellipsis">
-                                Fumes from indoor cooking fires kill more than 2 million children a year in the developing world. MIT engineer Amy Smith details an exciting but simple solution: a tool for turning farm waste into clean-burning charcoal.
-                            </p>
-                            <div class="button-wrapper">
-                                <a class="btn-solid-reg page-scroll" href="#request">WATCH</a>
-                            </div>
-                        </div>
-                    </div> <!-- end of card -->
-                    <!-- end of card -->
-
-                    <!-- Card-->
-                    <div class="card">
-                        <div class="label">
-                            <p class="category">Technology</p>
-                        </div>
-                        <div class="card-body">
-                            <div class="card-title ellipsis">The nightmare videos of children's YouTube — and what's wrong with the internet today</div>
-                            <div class="card-subtitle">Must have for large companies</div>
-                            <hr class="cell-divide-hr">
-                            <div class="price">
-                                <div class="video-wrapper">
-                                    <div style="max-width:854px">
-                                        <div style="position:relative;height:0;padding-bottom:56.25%;
-                                        background: url('https://pi.tedcdn.com/r/talkstar-photos.s3.amazonaws.com/uploads/44bf08f1-1a0e-4def-99f2-84a956cda88d/SupasornSuwajanakorn_2018-embed.jpg?w=1200');background-size: auto 100%;;">
-                                        </div></div>
-                                </div>
-                            </div>
-                            <hr class="cell-divide-hr">
-                            <p class="ellipsis">
-                                Fumes from indoor cooking fires kill more than 2 million children a year in the developing world. MIT engineer Amy Smith details an exciting but simple solution: a tool for turning farm waste into clean-burning charcoal.
-                            </p>
-                            <div class="button-wrapper">
-                                <a class="btn-solid-reg page-scroll" href="#request">WATCH</a>
-                            </div>
-                        </div>
-                    </div> <!-- end of card -->
-                    <!-- Card-->
-                    <div class="card">
-                        <div class="label">
-                            <p class="category">Communication</p>
-                        </div>
-                        <div class="card-body">
-                            <div class="card-title ellipsis">The nightmare videos of children's YouTube — and what's wrong with the internet today</div>
-                            <div class="card-subtitle">Must have for large companies</div>
-                            <hr class="cell-divide-hr">
-                            <div class="price">
-                                <div class="video-wrapper">
-                                    <div style="max-width:854px">
-                                        <div style="position:relative;height:0;padding-bottom:56.25%;
-                                        background: url('https://pi.tedcdn.com/r/talkstar-photos.s3.amazonaws.com/uploads/44bf08f1-1a0e-4def-99f2-84a956cda88d/SupasornSuwajanakorn_2018-embed.jpg?w=1200');background-size: auto 100%;;">
-                                        </div></div>
-                                </div>
-                            </div>
-                            <hr class="cell-divide-hr">
-                            <p class="ellipsis">
-                                Fumes from indoor cooking fires kill more than 2 million children a year in the developing world. MIT engineer Amy Smith details an exciting but simple solution: a tool for turning farm waste into clean-burning charcoal.
-                            </p>
-                            <div class="button-wrapper">
-                                <a class="btn-solid-reg page-scroll" href="#request">WATCH</a>
-                            </div>
-                        </div>
-                    </div> <!-- end of card -->
-                    <!-- Card-->
-                    <div class="card">
-                        <div class="label">
-                            <p class="category">Creativity</p>
-                        </div>
-                        <div class="card-body">
-                            <div class="card-title ellipsis">The nightmare videos of children's YouTube — and what's wrong with the internet today</div>
-                            <div class="card-subtitle">Must have for large companies</div>
-                            <hr class="cell-divide-hr">
-                            <div class="price">
-                                <div class="video-wrapper">
-                                    <div style="max-width:854px">
-                                        <div style="position:relative;height:0;padding-bottom:56.25%;
-                                        background: url('https://pi.tedcdn.com/r/talkstar-photos.s3.amazonaws.com/uploads/44bf08f1-1a0e-4def-99f2-84a956cda88d/SupasornSuwajanakorn_2018-embed.jpg?w=1200');background-size: auto 100%;;">
-                                        </div></div>
-                                </div>
-                            </div>
-                            <hr class="cell-divide-hr">
-                            <p class="ellipsis">
-                                Fumes from indoor cooking fires kill more than 2 million children a year in the developing world. MIT engineer Amy Smith details an exciting but simple solution: a tool for turning farm waste into clean-burning charcoal.
-                            </p>
-                            <div class="button-wrapper">
-                                <a class="btn-solid-reg page-scroll" href="#request">WATCH</a>
-                            </div>
-                        </div>
-                    </div> <!-- end of card -->
-                    <!-- end of card -->
-
-                </div> <!-- end of col -->
-            </div> <!-- end of row -->
-        </div> <!-- end of container -->
-    </div> <!-- end of cards-2 -->
-    <!-- end of pricing -->
-
+                {% endfor %}
+            </div> <!-- end of col -->
+        </div> <!-- end of row -->
+    </div> <!-- end of container -->
+</div> <!-- end of cards-2 -->
+<!-- end of pricing -->
 
 
 {% include 'footer.html' %}
