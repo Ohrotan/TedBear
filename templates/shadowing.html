@@ -41,10 +41,10 @@
                     <span class="col-sm-4" id="replay-btn" onclick="replay()">
                         <img class="video-btn" src="static/images/replay.png">
                     </span>
-                    <span class="col-sm-4 hide" id="stop-btn">
+                    <span class="col-sm-4 hide" id="stop-btn" onclick="pause()">
                         <img class="video-btn" src="static/images/stop.png">
                     </span>
-                    <span class="col-sm-4" id="play-btn">
+                    <span class="col-sm-4" id="play-btn" onclick="play()">
                         <img class="video-btn" src="static/images/play.png">
                     </span>
                     <span class="col-sm-4" id="rec-btn">
@@ -53,6 +53,12 @@
                     <span class="col-sm-4 hide" id="speak-btn">
                         <img class="video-btn" src="static/images/speak.png">
                     </span>
+                </div>
+
+                <div>
+                    <button id="record">Start Recording</button>
+                    <button id="play" disabled>Play</button>
+                    <button id="download" disabled>Download</button>
                 </div>
 
                 <div>
@@ -74,6 +80,8 @@
 
 {% include 'footer.html' %}
 
+<script src="/static/js/voice_record.js"></script>
+
 <script>
     // 2. This code loads the IFrame Player API code asynchronously.
     var tag = document.createElement('script');
@@ -93,7 +101,7 @@
             height: '360',
             width: '640',
             videoId: 'bbELpNDMEe0',
-            playerVars: {'controls': 0, 'loop': 1, 'modestbranding': 1, 'rel': 0},
+            playerVars: {'autoplay': 0, 'controls': 1, 'loop': 1, 'modestbranding': 1, 'rel': 0},
             events: {
                 'onReady': onPlayerReady,
                 'onStateChange': onPlayerStateChange
@@ -104,34 +112,33 @@
 
     // 4. The API will call this function when the video player is ready.
     function onPlayerReady(event) {
+        // seekToStart()
+        // repeat()
         //event.target.playVideo();
     }
 
     // 5. The API calls this function when the player's state changes.
     //    The function indicates that when playing a video (state=1),
     //    the player should play for six seconds and then stop.
-    var done = false;
-    function repeat(){
-        setInterval(seekToStart, duration * 1000 - player.getCurrentTime())
-        //setTimeout(seekToStart, duration * 1000 - player.getCurrentTime())
-    }
+    var timer = false;
+
+    var now = player.getCurrentTime() - start_time
+    var repeat = null;
+
 
     function onPlayerStateChange(event) {
-        if (event.data == YT.PlayerState.PLAYING) {
-            repeat();
-            done = true;
+        if (event.data == YT.PlayerState.PLAYING && timer == false) {
+            now = player.getCurrentTime() - start_time
+            repeat = setInterval(seekToStart, (duration - now) * 1000)
+            timer = true;
         } else if (event.data == YT.PlayerState.PAUSED) {
             console.log(player.getPlayerState())
-            clearTimeout(repeat)
+            clearInterval(repeat)
+            timer = false
         }
     }
 
-    function stopVideo() {
-        player.stopVideo();
-    }
-
-
-    $("#play-btn").on('click', function () {
+    function play() {
         $("#stop-btn").removeClass("hide")
         $("#play-btn").addClass("hide")
         player.mute()
@@ -139,24 +146,19 @@
             seekToStart()
         }
         player.playVideo()
-    });
+    }
 
-    $("#stop-btn").on('click', function () {
+    function pause() {
         $("#play-btn").removeClass("hide")
         $("#stop-btn").addClass("hide")
         player.pauseVideo()
-    });
+    }
 
     function seekToStart() {
         player.seekTo(start_time, true)
         //player.playVideo()
     }
 
-    function replay() {
-        //player.pauseVideo()
-        //seekTo()
-        //setTimeout(replay, duration);
-    }
 
     $("#rec-btn").on('click', function () {
         $("#speak-btn").removeClass("hide")

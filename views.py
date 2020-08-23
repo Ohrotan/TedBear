@@ -15,18 +15,25 @@ from sqlalchemy import create_engine, text
 @app.route('/')
 @app.route('/home')
 def home():
+
     originlist=app.database.execute('SELECT topics,title,speaker,image,description FROM talks limit 6').fetchall()
     sqllist=[]
     for i in originlist:
         i=list(i)
         i[0]=ast.literal_eval(i[0])
         sqllist.append(i)
-
-    return render_template(
-        'home.html',
-        name=session['name'],
-        sqllist=sqllist
-    )
+    try:
+        if session['name']:
+            return render_template(
+                'home.html',
+                name=session['name'],
+                sqllist=sqllist
+            )
+    except:
+        return render_template(
+            'home.html',
+            sqllist=sqllist
+        )
 @app.route('/history')
 def history():
 
@@ -59,10 +66,8 @@ def logout():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        msg = ''
         email = request.form['remail']
         pwd = request.form['rpwd']
-        #print(email,pwd)
         account = app.database.execute("SELECT * FROM user WHERE email = %s and pwd = %s",(email,pwd)).fetchall()
         print(account)
         if account:
