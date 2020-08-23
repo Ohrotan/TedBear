@@ -12,13 +12,7 @@
                     <h3>Simple Designs to save a life</h3>
                     <h4 class="font-gray3"> by Speaker</h4>
                     <div class="video-wrapper">
-
-                        <div style="max-width:854px">
-                            <div style="position:relative;height:0;padding-bottom:56.25%">
-                                 <iframe src="https://embed.ted.com/talks/amy_smith_simple_designs_to_save_a_life" width="854" height="480" style="position:absolute;left:0;top:0;width:100%;height:100%" frameborder="0" scrolling="no" allowfullscreen>
-                                 </iframe>
-                            </div>
-                        </div>
+                        <div id="player"></div>
                     </div> <!-- end of video-wrapper -->
 
 
@@ -44,19 +38,19 @@
                     한국말 한국말한국말한국말한국말한국말 한국말한국말한국말한국말한국말한국말한국말한국말한국말한국말
                 </p>
                 <div class="row" style="margin-top: 2rem;">
-                    <span class="col-sm-4">
+                    <span class="col-sm-4" id="replay-btn" onclick="replay()">
                         <img class="video-btn" src="static/images/replay.png">
                     </span>
-                    <span class="col-sm-4 hide">
+                    <span class="col-sm-4 hide" id="stop-btn">
                         <img class="video-btn" src="static/images/stop.png">
                     </span>
-                    <span class="col-sm-4">
+                    <span class="col-sm-4" id="play-btn">
                         <img class="video-btn" src="static/images/play.png">
                     </span>
-                    <span class="col-sm-4">
+                    <span class="col-sm-4" id="rec-btn">
                         <img class="video-btn" src="static/images/mic.png">
                     </span>
-                    <span class="col-sm-4 hide">
+                    <span class="col-sm-4 hide" id="speak-btn">
                         <img class="video-btn" src="static/images/speak.png">
                     </span>
                 </div>
@@ -77,4 +71,107 @@
 </div> <!-- end of basic-3 -->
 <!-- end of main -->
 
+
 {% include 'footer.html' %}
+
+<script>
+    // 2. This code loads the IFrame Player API code asynchronously.
+    var tag = document.createElement('script');
+
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    // 3. This function creates an <iframe> (and YouTube player)
+    //    after the API code downloads.
+    var player;
+    var start_time = 2;
+    var duration = 3;
+
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+            height: '360',
+            width: '640',
+            videoId: 'bbELpNDMEe0',
+            playerVars: {'controls': 0, 'loop': 1, 'modestbranding': 1, 'rel': 0},
+            events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange
+            }
+        });
+
+    }
+
+    // 4. The API will call this function when the video player is ready.
+    function onPlayerReady(event) {
+        //event.target.playVideo();
+    }
+
+    // 5. The API calls this function when the player's state changes.
+    //    The function indicates that when playing a video (state=1),
+    //    the player should play for six seconds and then stop.
+    var done = false;
+    function repeat(){
+        setInterval(seekToStart, duration * 1000 - player.getCurrentTime())
+        //setTimeout(seekToStart, duration * 1000 - player.getCurrentTime())
+    }
+
+    function onPlayerStateChange(event) {
+        if (event.data == YT.PlayerState.PLAYING) {
+            repeat();
+            done = true;
+        } else if (event.data == YT.PlayerState.PAUSED) {
+            console.log(player.getPlayerState())
+            clearTimeout(repeat)
+        }
+    }
+
+    function stopVideo() {
+        player.stopVideo();
+    }
+
+
+    $("#play-btn").on('click', function () {
+        $("#stop-btn").removeClass("hide")
+        $("#play-btn").addClass("hide")
+        player.mute()
+        if (player.getCurrentTime() > start_time + duration || player.getCurrentTime() < start_time) {
+            seekToStart()
+        }
+        player.playVideo()
+    });
+
+    $("#stop-btn").on('click', function () {
+        $("#play-btn").removeClass("hide")
+        $("#stop-btn").addClass("hide")
+        player.pauseVideo()
+    });
+
+    function seekToStart() {
+        player.seekTo(start_time, true)
+        //player.playVideo()
+    }
+
+    function replay() {
+        //player.pauseVideo()
+        //seekTo()
+        //setTimeout(replay, duration);
+    }
+
+    $("#rec-btn").on('click', function () {
+        $("#speak-btn").removeClass("hide")
+        $("#rec-btn").addClass("hide")
+    });
+    $("#speak-btn").on('click', function () {
+        $("#rec-btn").removeClass("hide")
+        $("#speak-btn").addClass("hide")
+    });
+
+
+    $("#prev-btn").on('click', function () {
+        //이전 문장으로 이동
+    });
+    $("#next-btn").on('click', function () {
+        //다음 문장으로 이동
+    });
+</script>
