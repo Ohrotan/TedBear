@@ -69,7 +69,11 @@
                     <a class="nav-link page-scroll" href="#services">My Page</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link page-scroll" href="#pricing">Log out</a>
+                    {% if name %}
+                    <a class="nav-link page-scroll" href="/logout">Log out</a>
+                    {% else %}
+                    <a class="nav-link page-scroll" href="/login">Log in</a>
+                    {% endif %}
                 </li>
 
                 <!-- Dropdown Menu -->

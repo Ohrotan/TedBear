@@ -7,6 +7,9 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
+                {% if name %}
+                    {{ name }} 님 반갑습니다.
+                {% endif %}
 
                 <form id="search-form" class="search-form">
                     <div class="form-group">

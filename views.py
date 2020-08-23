@@ -7,8 +7,10 @@ from flask import render_template
 from init import app
 from jinja2 import Template
 import ast
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session, redirect
 from sqlalchemy import create_engine, text
+
+
 
 @app.route('/')
 @app.route('/home')
@@ -19,10 +21,10 @@ def home():
         i=list(i)
         i[0]=ast.literal_eval(i[0])
         sqllist.append(i)
-    """Renders the home page."""
+
     return render_template(
         'home.html',
-        title='Home Page',
+        name=session['name'],
         sqllist=sqllist
     )
 @app.route('/history')
@@ -47,28 +49,32 @@ def shadowing():
     return render_template(
         'shadowing.html'
     )
+@app.route('/logout')
+def logout():
+    session['id'] = None
+    session['name'] = None
+    session['email'] = None
+    return redirect('/home')
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         msg = ''
         email = request.form['remail']
         pwd = request.form['rpwd']
-        print(email,pwd)
-        account = app.database.execute("SELECT * FROM user WHERE email =%s and pwd =%s",(email,pwd)).fetchall()
+        #print(email,pwd)
+        account = app.database.execute("SELECT * FROM user WHERE email = %s and pwd = %s",(email,pwd)).fetchall()
+        print(account)
         if account:
-            msg='success'
-            return render_template('home.html' )
+            session['id']=account[0][0]
+            session['email']=account[0][1]
+            session['name']=account[0][2]
+            return redirect('/home')
         else:
-            msg = 'Incorrect username/password!'
-            return render_template('login.html')
+            return render_template('login.html', msg='Incorrect username/password!')
 
     if request.method == 'GET':
-        return render_template(
-            'login.html',
-            title='Contact',
-            year=datetime.now().year,
-            message='Your contact page.'
-        )
+        return render_template('login.html')
 
 @app.route('/register')
 def register():
