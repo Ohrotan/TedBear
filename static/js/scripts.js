@@ -157,7 +157,7 @@
 
 
     /* Request Form */
-    $("#requestForm").validator().on("submit", function(event) {
+    $("#requestFormdd").validator().on("submit", function(event) {
     	if (event.isDefaultPrevented()) {
             // handle the invalid form...
             rformError();
@@ -179,8 +179,8 @@
         
         $.ajax({
             type: "POST",
-            url: "php/requestform-process.php",
-            data: "name=" + name + "&email=" + email + "&phone=" + phone + "&select=" + select + "&terms=" + terms, 
+            url: "/login",
+            data: "&email=" + email + "&pwd=" + pwd ,
             success: function(text) {
                 if (text == "success") {
                     rformSuccess();
