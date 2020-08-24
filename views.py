@@ -36,15 +36,21 @@ def home():
         )
 @app.route('/history')
 def history():
-
-    originlist = app.database.execute('SELECT a.talks_title,a.last_time,b.topics,b.speaker,b.image,b.duration FROM watching_record as a join talks as b on b.id=a.talks_id '
-                                      'where a.user_id=%s',(82)).fetchall()
+    id=session['id']
+    originlist = app.database.execute('SELECT a.talks_title,a.last_time,b.topics,b.speaker,b.image,b.id FROM watching_record as a join talks as b on b.id=a.talks_id '
+                                      'where a.user_id=%s',(id)).fetchall()
     sqllist = []
     for i in originlist:
         i=list(i)
         i[2] = ast.literal_eval(i[2])
+        sentences=list(app.database.execute(
+            'SELECT count(*) from sentence where talks_id=%s', (i[5])).fetchall())
+        shadows=list(app.database.execute(
+            'SELECT count(*) from shadowing_record where talks_id=%s', (i[5])).fetchall())
+        i.append(sentences[0][0])
+        i.append(shadows[0][0])
         sqllist.append(i)
-        print(i[1],i[5])
+        print(sqllist)
     """Renders the home page."""
     return render_template(
         'history.html',sqllist=sqllist
