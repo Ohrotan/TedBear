@@ -6,11 +6,13 @@
         <div class="row">
             <!-- Video -->
             <div class="col-lg-6">
+                <input type="hidden" id="talks_id" value="{{ talks_info.id }}"/>
+                <input type="hidden" id="sentence_id" value="{{ last_sentence.id }}"/>
 
                 <!-- Video Preview -->
                 <div class="image-container">
-                    <h3>Simple Designs to save a life</h3>
-                    <h4 class="font-gray3"> by Speaker</h4>
+                    <h3>{{ talks_info.title }}</h3>
+                    <h4 class="font-gray3"> by {{ talks_info.speaker }}</h4>
                     <div class="video-wrapper">
                         <div id="player"></div>
                     </div> <!-- end of video-wrapper -->
@@ -31,44 +33,43 @@
                     Transcript
                 </h3><h4>&nbsp;</h4>
                 <p class="transcript-en">
-                    This video will show you a case study for one of our This video will show you a case study for one
-                    of our
+                    {{ last_sentence.sentence_en }}
                 </p>
-                <p class="transcript-ko">
-                    한국말 한국말한국말한국말한국말한국말 한국말한국말한국말한국말한국말한국말한국말한국말한국말한국말
+                <p class="transcript-kr">
+                    {{ last_sentence.sentence_kr }}
                 </p>
                 <div class="row" style="margin-top: 2rem;">
                     <span class="col-sm-4" id="replay-btn" onclick="replay()">
-                        <img class="video-btn" src="static/images/replay.png">
+                        <img class="video-btn" src="/static/images/replay.png">
                     </span>
                     <span class="col-sm-4 hide" id="stop-btn" onclick="pause()">
-                        <img class="video-btn" src="static/images/stop.png">
+                        <img class="video-btn" src="/static/images/stop.png">
                     </span>
                     <span class="col-sm-4" id="play-btn" onclick="play()">
-                        <img class="video-btn" src="static/images/play.png">
+                        <img class="video-btn" src="/static/images/play.png">
                     </span>
                     <span class="col-sm-4" id="rec-btn">
-                        <img class="video-btn" src="static/images/mic.png">
+                        <img class="video-btn" src="/static/images/mic.png">
                     </span>
                     <span class="col-sm-4 hide" id="speak-btn">
-                        <img class="video-btn" src="static/images/speak.png">
+                        <img class="video-btn" src="/static/images/speak.png">
                     </span>
                 </div>
 
-                <div>
-                    <button id="record">Start Recording</button>
-                    <button id="play" disabled>Play</button>
-                    <button id="download" disabled>Download</button>
+                <div id="controls">
                 </div>
+                <div id="formats">Format: start recording to see sample rate</div>
+                <p><strong>Recordings:</strong></p>
+                <ol id="recordingsList"></ol>
 
                 <div>
                     <span id="prev-btn">
-                        <img class="btn-img" src="static/images/left.png">
+                        <img class="btn-img" src="/static/images/left.png">
                            이전 문장
                     </span>
                     <span id="next-btn">
                         다음 문장
-                        <img class="btn-img" src="static/images/right.png">
+                        <img class="btn-img" src="/static/images/right.png">
                     </span>
                 </div>
             </div><!-- end of col,Transcript -->
@@ -80,8 +81,8 @@
 
 {% include 'footer.html' %}
 
+<script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
 <script src="/static/js/voice_record.js"></script>
-
 <script>
     // 2. This code loads the IFrame Player API code asynchronously.
     var tag = document.createElement('script');
@@ -93,14 +94,14 @@
     // 3. This function creates an <iframe> (and YouTube player)
     //    after the API code downloads.
     var player;
-    var start_time = 2;
+    var start_time = 0;
     var duration = 3;
 
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('player', {
             height: '360',
             width: '640',
-            videoId: 'bbELpNDMEe0',
+            videoId: '{{ yt_url }}',
             playerVars: {'autoplay': 0, 'controls': 1, 'loop': 1, 'modestbranding': 1, 'rel': 0},
             events: {
                 'onReady': onPlayerReady,

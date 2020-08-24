@@ -30,33 +30,31 @@
         </div>  end of row -->
         <div class="row">
             <div class="col-lg-12">
-
-                {{ sqllist.size }}
                 <!-- Card-->
-                {% for i in sqllist %}
+                {% for i in video_list %}
                     <div class="card">
                         <div class="label">
-                            <p class="category">{{ i[0][0] }}</p>
+                            <p class="category">{{ i.topic }}</p>
                         </div>
                         <div class="card-body">
-                            <div class="card-title ellipsis">{{ i[1] }}</div>
-                            <div class="card-subtitle">{{ i[2] }}</div>
+                            <div class="card-title ellipsis">{{ i.title }}</div>
+                            <div class="card-subtitle">{{ i.speaker }}</div>
                             <hr class="cell-divide-hr">
                             <div class="price">
                                 <div class="video-wrapper">
                                     <div style="max-width:854px">
                                         <div style="position:relative;height:0;padding-bottom:56.25%;
-                                                background: url({{ i[3] }});background-size: auto 100%;;">
+                                                background: url({{ i.image }});background-size: auto 100%;">
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <hr class="cell-divide-hr">
                             <p class="ellipsis">
-                                {{ i[4] }}
+                                {{ i.description }}
                             </p>
                             <div class="button-wrapper">
-                                <a class="btn-solid-reg page-scroll" href="#request">WATCH</a>
+                                <a class="btn-solid-reg page-scroll" href="/shadowing/{{ i.id }}">WATCH</a>
                             </div>
                         </div>
                     </div> <!-- end of card -->

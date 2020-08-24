@@ -18,7 +18,7 @@
                 {% for i in sqllist %}
                     <div class="card">
                         <div class="label">
-                            <p class="category">{{ i[2][0] }}</p>
+                            <p class="category">{{ i[2] }}</p>
                         </div>
                         <div class="card-body">
                             <div class="card-title ellipsis">{{ i[0] }}</div>
@@ -37,7 +37,7 @@
                             <span class="value">{{ (i[7]/i[6]*100)|round(1) }}</span><span class="percent">%</span>
                             <div class="button-wrapper">
                                 <a class="btn-solid-second page-scroll" href="#request">RESULT</a>
-                                <a class="btn-solid-reg page-scroll" href="#request">WATCH</a>
+                                <a class="btn-solid-reg page-scroll" href="/shadowing/{{ i[5] }}">WATCH</a>
                             </div>
                         </div>
                     </div> <!-- end of card -->
