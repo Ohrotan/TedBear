@@ -58,8 +58,8 @@
 
                 <div id="controls">
                 </div>
-                <div id="formats">Format: start recording to see sample rate</div>
-                <p><strong>Recordings:</strong></p>
+                <div id="formats">&nbsp;</div>
+
                 <ol id="recordingsList"></ol>
 
                 <div>
@@ -94,8 +94,8 @@
     // 3. This function creates an <iframe> (and YouTube player)
     //    after the API code downloads.
     var player;
-    var start_time = 0;
-    var duration = 3;
+    var start_time = {{ last_sentence.start_time }};
+    var duration = {{ last_sentence.duration }};
 
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('player', {

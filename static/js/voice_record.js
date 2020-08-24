@@ -52,7 +52,7 @@ function startRecording() {
         */
             audioContext = new AudioContext({ sampleRate: 16000 });
         //update the format
-        document.getElementById("formats").innerHTML = "Format: 1 channel pcm @ " + audioContext.sampleRate / 1000 + "kHz"
+        //document.getElementById("formats").innerHTML = "Format: 1 channel pcm @ " + audioContext.sampleRate / 1000 + "kHz"
 
         /*  assign to gumStream for later use  */
         gumStream = stream;
@@ -114,6 +114,7 @@ function stopRecording() {
     $("#rec-btn").removeClass("hide")
     //create the wav blob and pass it on to createDownloadLink
     rec.exportWAV(createDownloadLink);
+
 }
 
 function createDownloadLink(blob) {
@@ -133,16 +134,16 @@ function createDownloadLink(blob) {
     //save to disk link
     link.href = url;
     link.download = filename + ".wav"; //download forces the browser to donwload the file using the  filename
-    link.innerHTML = "Save to disk";
+    //link.innerHTML = "Save to disk";
 
     //add the new audio element to li
     li.appendChild(au);
 
     //add the filename to the li
-    li.appendChild(document.createTextNode(filename + ".wav "))
+    //li.appendChild(document.createTextNode(filename + ".wav "))
 
     //add the save to disk link to li
-    li.appendChild(link);
+    //li.appendChild(link);
 
     //upload link
     var upload = document.createElement('a');
@@ -153,6 +154,9 @@ function createDownloadLink(blob) {
         xhr.onload = function (e) {
             if (this.readyState === 4) {
                 console.log("Server returned: ", e.target.responseText);
+                img_tag = document.createElement('img');
+                img_tag.src = e.target.responseText
+                li.appendChild(img_tag)
             }
         };
         var fd = new FormData();
@@ -162,8 +166,9 @@ function createDownloadLink(blob) {
         xhr.open("POST", "/upload", true);
         xhr.send(fd);
     })
-    li.appendChild(document.createTextNode(" "))//add a space in between
-    li.appendChild(upload)//add the upload link to li
+    //li.appendChild(document.createTextNode(" "))//add a space in between
+    //li.appendChild(upload)//add the upload link to li
+    upload.click()
 
     //add the li element to the ol
     recordingsList.appendChild(li);

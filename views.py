@@ -77,11 +77,18 @@ def upload():
         print("user audio file path:", os.path.abspath(filename))
     print('file uploaded successfully')
 
+    # 여기서 음성파일 올리고, 음성 컨버트 시키고 평가하기
+
+    # 평가한 이미지파일, 컨버트 결과 파일 DB에 넣기
+
     s_record = ShadowingRecord(user_id=session['id'], talks_id=request.form['talks_id'],\
-                               sentence_id=request.form['sentence_id'],user_audio=os.path.abspath(filename),
+                               sentence_id=request.form['sentence_id'],user_audio=os.path.abspath(filename)
                                )
     db_session.add(s_record)
-    return 'ok'
+
+    # voice_recorder.js 155line에서 결과 이미지 띄우는 코드 만들기
+
+    return '/static/images/search.png'
 
 
 @app.route('/shadowing/<talks_id>')
@@ -101,21 +108,22 @@ def shadowing(talks_id):
     if seen == 0:
         w_record = WatchingRecord(user_id=user_id, talks_id=talks_id, talks_title=talks_info.title)
         db_session.add(w_record)
-        sentence = Sentence.query.filter_by(talks_id=talks_id).first()
-        if sentence is not None:
-            last_sentence = sentence
+
     else:
         # 봤던거면 마지막 센텐스 위치찾기
         q = ShadowingRecord.query.filter_by(user_id=user_id, talks_id=talks_id).order_by(ShadowingRecord.id.desc())
-
         if q.count() > 0:
-            last_sentence = q.first()
-
+            last_sentence = Sentence.query.filter_by(id = q.first().sentence_id).first()
+            print(last_sentence)
+        else:
+            sentence = Sentence.query.filter_by(talks_id=talks_id).first()
+            if sentence is not None:
+                last_sentence = sentence
     return render_template(
         'shadowing.html',
         talks_info=talks_info,
         last_sentence=last_sentence,
-        yt_url='bbELpNDMEe0'
+        yt_url=talks_info.yt_url
     )
 
 
