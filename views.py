@@ -15,7 +15,14 @@ from sqlalchemy import create_engine, text
 @app.route('/')
 @app.route('/home')
 def home():
-    originlist = Talks.query.limit(6).all()
+    has_transcript_id = "SELECT distinct(talks_id) FROM sentence"
+    sql_query ="SELECT * FROM talks WHERE id in "+has_transcript_id
+    valid_talks_id = app.database.execute(has_transcript_id).fetchall()
+
+    valid_talks_id = [a['talks_id'] for a in valid_talks_id]
+
+    originlist = Talks.query.filter(Talks.id.in_(valid_talks_id)).all()
+
     video_list = []
     for talks in originlist:
         talks.topic = ast.literal_eval(talks.topics)[0]
@@ -81,8 +88,8 @@ def upload():
 
     # 평가한 이미지파일, 컨버트 결과 파일 DB에 넣기
 
-    s_record = ShadowingRecord(user_id=session['id'], talks_id=request.form['talks_id'],\
-                               sentence_id=request.form['sentence_id'],user_audio=os.path.abspath(filename)
+    s_record = ShadowingRecord(user_id=session['id'], talks_id=request.form['talks_id'], \
+                               sentence_id=request.form['sentence_id'], user_audio=os.path.abspath(filename)
                                )
     db_session.add(s_record)
 
@@ -95,7 +102,10 @@ def upload():
 def shadowing(talks_id):
     # talks 정보 가져오기
     talks_info = Talks.query.filter(Talks.id == talks_id).first()
-    last_sentence = None
+    global transcript
+    transcript = Sentence.query.filter_by(talks_id=talks_id).all()
+    transcript_index = 0
+
     # 사용자 히스토리 기록
     user_id = None
     try:
@@ -111,20 +121,48 @@ def shadowing(talks_id):
 
     else:
         # 봤던거면 마지막 센텐스 위치찾기
-        q = ShadowingRecord.query.filter_by(user_id=user_id, talks_id=talks_id).order_by(ShadowingRecord.id.desc())
-        if q.count() > 0:
-            last_sentence = Sentence.query.filter_by(id = q.first().sentence_id).first()
-            print(last_sentence)
-        else:
-            sentence = Sentence.query.filter_by(talks_id=talks_id).first()
-            if sentence is not None:
-                last_sentence = sentence
+        transcript_index = ShadowingRecord.query.filter_by(user_id=user_id, talks_id=talks_id).count()
+
+    if talks_info.youtube_gap is None:
+        talks_info.youtube_gap = 0
+
     return render_template(
         'shadowing.html',
         talks_info=talks_info,
-        last_sentence=last_sentence,
-        yt_url=talks_info.yt_url
+        transcript=transcript,
+        transcript_index=transcript_index
     )
+
+
+@app.route('/next_sentence', methods=['POST'])
+def next_sentence():
+    num = request.form['transcript_index']
+    if num == len(transcript) - 1:
+        return 'fail'
+
+    result = transcript[int(num) + 1].__dict__
+    result['audio'] = ''
+    result['sentence_kr'] = ''
+    try:
+        del result['_sa_instance_state']
+    except:
+        v = 1
+    return result
+
+
+@app.route('/prev_sentence', methods=['POST'])
+def prev_sentence():
+    num = request.form['transcript_index']
+    if num == 0:
+        return 'fail'
+    result = transcript[int(num) - 1].__dict__
+    result['audio'] = ''
+    result['sentence_kr'] = ''
+    try:
+        del result['_sa_instance_state']
+    except:
+        v = 1
+    return result
 
 
 @app.route('/record')

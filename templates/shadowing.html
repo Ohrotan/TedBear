@@ -7,8 +7,8 @@
             <!-- Video -->
             <div class="col-lg-6">
                 <input type="hidden" id="talks_id" value="{{ talks_info.id }}"/>
-                <input type="hidden" id="sentence_id" value="{{ last_sentence.id }}"/>
-
+                <input type="hidden" id="sentence_id" value="{{ transcript[transcript_index].id }}"/>
+                <input type="hidden" id="transcript_index" value="{{ transcript_index }}"/>
                 <!-- Video Preview -->
                 <div class="image-container">
                     <h3>{{ talks_info.title }}</h3>
@@ -32,11 +32,11 @@
                 <h3>
                     Transcript
                 </h3><h4>&nbsp;</h4>
-                <p class="transcript-en">
-                    {{ last_sentence.sentence_en }}
+                <p class="transcript-en" id="sentence_en">
+                    {{ transcript[transcript_index].sentence_en }}
                 </p>
-                <p class="transcript-kr">
-                    {{ last_sentence.sentence_kr }}
+                <p class="transcript-kr" id="sentence_kr">
+                    {{ transcript[transcript_index].sentence_kr }}
                 </p>
                 <div class="row" style="margin-top: 2rem;">
                     <span class="col-sm-4" id="replay-btn" onclick="replay()">
@@ -63,11 +63,11 @@
                 <ol id="recordingsList"></ol>
 
                 <div>
-                    <span id="prev-btn">
+                    <span id="prev-btn" onclick="prevSentence()">
                         <img class="btn-img" src="/static/images/left.png">
                            이전 문장
                     </span>
-                    <span id="next-btn">
+                    <span id="next-btn" onclick="nextSentence()">
                         다음 문장
                         <img class="btn-img" src="/static/images/right.png">
                     </span>
@@ -93,15 +93,25 @@
 
     // 3. This function creates an <iframe> (and YouTube player)
     //    after the API code downloads.
+
+
+
+    var transcript_index = {{ transcript_index }};
+
     var player;
-    var start_time = {{ last_sentence.start_time }};
-    var duration = {{ last_sentence.duration }};
+    {% set time = transcript[transcript_index].start_time + talks_info.youtube_gap %}
+    var gap =
+    {{ talks_info.youtube_gap }}
+    var start_time = {{ time }};
+
+    var duration = {{ transcript[transcript_index].duration }};
+
 
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('player', {
             height: '360',
             width: '640',
-            videoId: '{{ yt_url }}',
+            videoId: '{{ talks_info.yt_url }}',
             playerVars: {'autoplay': 0, 'controls': 1, 'loop': 1, 'modestbranding': 1, 'rel': 0},
             events: {
                 'onReady': onPlayerReady,
@@ -171,10 +181,66 @@
     });
 
 
-    $("#prev-btn").on('click', function () {
-        //이전 문장으로 이동
-    });
-    $("#next-btn").on('click', function () {
-        //다음 문장으로 이동
-    });
+    function prevSentence() {
+
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function (e) {
+            if (this.readyState === 4) {
+                console.log("Server returned: ", e.target.responseText);
+                sentence = e.target.responseText
+                if (sentence == 'fail') {
+                    return;
+                }
+                sentence = JSON.parse(sentence)
+                document.getElementById("sentence_en").textContent = sentence['sentence_en']
+                document.getElementById("sentence_kr").textContent = sentence['sentence_kr']
+                start_time = sentence['start_time'] + gap
+                console.log(sentence['start_time'])
+                duration = sentence['duration']
+                document.getElementById("transcript_index").value = --transcript_index
+                document.getElementById("sentence_id").value = sentence['id']
+                console.log(player.getPlayerState())
+                if (player.getPlayerState() == 1) {
+                    console.log('pause and play')
+                    pause()
+                    play()
+                } else {
+                    seekToStart()
+                }
+
+
+            }
+        };
+        var fd = new FormData();
+        fd.append("transcript_index", document.getElementById("transcript_index").value);
+        xhr.open("POST", "/prev_sentence", true);
+        xhr.send(fd);
+
+    }
+
+    function nextSentence() {
+
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function (e) {
+            if (this.readyState === 4) {
+                console.log("Server returned: ", e.target.responseText);
+                sentence = e.target.responseText
+                sentence = JSON.parse(sentence)
+                console.log('{{ transcript[transcript_index] }}')
+                document.getElementById("sentence_en").textContent = sentence['sentence_en']
+                document.getElementById("sentence_kr").textContent = sentence['sentence_kr']
+                start_time = sentence['start_time'] + gap
+                duration = sentence['duration']
+                document.getElementById("transcript_index").value = ++transcript_index
+                document.getElementById("sentence_id").value = sentence['id']
+
+                seekToStart()
+            }
+        };
+        var fd = new FormData();
+        fd.append("transcript_index", document.getElementById("transcript_index").value);
+        xhr.open("POST", "/next_sentence", true);
+        xhr.send(fd);
+
+    }
 </script>

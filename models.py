@@ -32,7 +32,7 @@ class Talks(Base):
     youtube_gap = Column(Integer)
     yt_url = Column(String(50))
 
-    def __init__(self, id=None, url=None, title=None, speaker=None, image=None, youtube_gap=None, \
+    def __init__(self, id=None, url=None, title=None, speaker=None, image=None, youtube_gap=None,
                  published_date=None, duration=None, description=None, yt_url=None):
         self.id = id
         self.url = url
@@ -72,7 +72,7 @@ class Sentence(Base):
         self.sentence_en = sentence_en
 
     def __repr__(self):
-        return '<Sentence %s, %s, %s>' % (self.id, self.talks_id, self.sentence)
+        return '<Sentence %s, %s, %s>' % (self.id, self.talks_id, self.sentence_en)
 
 
 class WatchingRecord(Base):
