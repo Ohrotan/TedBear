@@ -1564,7 +1564,7 @@ a.back-to-top {
 	width: 2.625rem;
 	height: 2.625rem;
 	border-radius: 1.875rem;
-	background: var(--main-blue) url("../../images/up-arrow.png") no-repeat center 47%;
+	background: var(--main-blue) url("/static/images/up-arrow.png") no-repeat center 47%;
 	background-size: 1.125rem 1.125rem;
 	text-indent: -9999px;
 }

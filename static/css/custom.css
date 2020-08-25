@@ -157,6 +157,11 @@
     padding: 0 0 1rem 0;
     color: red;
 }
+
+.big-btn{
+    font-size: 1.5rem;
+    padding: 1.85rem;
+}
 @media (min-width: 768px) {
     .search-img {
         margin-left: 8%;

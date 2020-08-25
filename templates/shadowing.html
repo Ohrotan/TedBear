@@ -19,11 +19,12 @@
 
 
                 </div> <!-- end of image-container -->
-                <!-- end of video preview -->
+                <!-- end of video preview
                 <div class="custom-control custom-switch">
                     <input class="custom-control-input" id="customSwitch1" type="checkbox">
                     <label class="custom-control-label" for="customSwitch1">내 목소리로 듣기</label>
-                </div>
+                </div>-->
+                <button class="btn-solid-reg big-btn" id="convert-btn" onclick="convert()">내 목소리로 듣기</button>
 
             </div> <!-- end of col,Video -->
 
@@ -105,7 +106,10 @@
     var start_time = {{ time }};
 
     var duration = {{ transcript[transcript_index].duration }};
+    var timer = false;
 
+    var now = 0
+    var repeat = null;
 
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('player', {
@@ -131,10 +135,7 @@
     // 5. The API calls this function when the player's state changes.
     //    The function indicates that when playing a video (state=1),
     //    the player should play for six seconds and then stop.
-    var timer = false;
 
-    var now = player.getCurrentTime() - start_time
-    var repeat = null;
 
 
     function onPlayerStateChange(event) {
@@ -152,7 +153,7 @@
     function play() {
         $("#stop-btn").removeClass("hide")
         $("#play-btn").addClass("hide")
-        player.mute()
+        //player.mute()
         if (player.getCurrentTime() > start_time + duration || player.getCurrentTime() < start_time) {
             seekToStart()
         }
@@ -226,6 +227,38 @@
                 console.log("Server returned: ", e.target.responseText);
                 sentence = e.target.responseText
                 sentence = JSON.parse(sentence)
+                document.getElementById("sentence_en").textContent = sentence['sentence_en']
+                document.getElementById("sentence_kr").textContent = sentence['sentence_kr']
+                start_time = sentence['start_time'] + gap
+                duration = sentence['duration']
+                document.getElementById("transcript_index").value = ++transcript_index
+                document.getElementById("sentence_id").value = sentence['id']
+
+                 console.log(player.getPlayerState())
+                if (player.getPlayerState() == 1) {
+                    console.log('pause and play')
+                    pause()
+                    play()
+                } else {
+                    seekToStart()
+                }
+            }
+        };
+        var fd = new FormData();
+        fd.append("transcript_index", document.getElementById("transcript_index").value);
+        xhr.open("POST", "/next_sentence", true);
+        xhr.send(fd);
+
+    }
+    function convert(){
+        $("#convert-btn")[0].innerText="변환 중..."
+        /**
+         var xhr = new XMLHttpRequest();
+        xhr.onload = function (e) {
+            if (this.readyState === 4) {
+                console.log("Server returned: ", e.target.responseText);
+                sentence = e.target.responseText
+                sentence = JSON.parse(sentence)
                 console.log('{{ transcript[transcript_index] }}')
                 document.getElementById("sentence_en").textContent = sentence['sentence_en']
                 document.getElementById("sentence_kr").textContent = sentence['sentence_kr']
@@ -239,8 +272,10 @@
         };
         var fd = new FormData();
         fd.append("transcript_index", document.getElementById("transcript_index").value);
-        xhr.open("POST", "/next_sentence", true);
+        xhr.open("POST", "/convert", true);
         xhr.send(fd);
 
+    }
+         **/
     }
 </script>
