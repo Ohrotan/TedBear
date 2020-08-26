@@ -26,7 +26,7 @@ def get_converted_audio(user_id, user_audio_path, org_audio_path) : #아래 함�
     convert.convert()
     hydra._internal.hydra.GlobalHydra().clear()
 
-get_converted_audio('kang1','./english/train/voice/','./english/test/')
+
 
 @app.route('/')
 @app.route('/home')
@@ -104,7 +104,7 @@ def upload_record():
     print('file uploaded successfully')
 
     # 여기서 음성파일 올리고, 음성 컨버트 시키고 평가하기
-
+    get_converted_audio('kang1', './english/train/voice/', './english/test/')
     # 평가한 이미지파일, 컨버트 결과 파일 DB에 넣기
 
     s_record = ShadowingRecord(user_id=session['id'], talks_id=request.form['talks_id'], \
