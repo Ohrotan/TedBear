@@ -8,38 +8,21 @@ from models import Talks, WatchingRecord, Sentence, ShadowingRecord
 import ast
 from flask import Flask, jsonify, request, session, redirect
 
-import importlib
-import pkgutil
-
-
-def import_submodules(package, recursive=True):
-    """ Import all submodules of a module, recursively, including subpackages
-
-    :param package: package (name or actual module)
-    :type package: str | module
-    :rtype: dict[str, types.ModuleType]
-    """
-    if isinstance(package, str):
-        package = importlib.import_module(package)
-    results = {}
-    for loader, name, is_pkg in pkgutil.walk_packages(package.__path__):
-        full_name = package.__name__ + '.' + name
-        results[full_name] = importlib.import_module(full_name)
-        if recursive and is_pkg:
-            results.update(import_submodules(full_name))
-    return results
-
-import zerospeech
-import_submodules(zerospeech)
+print(os.getcwd())
+from zerospeech import preprocess
+#os.chdir('../TedBear-Web/zerospeech')
+print(os.getcwd())
+preprocess.preprocess_dataset()
 import sys
+
 #sys.path.append('./zerospeech')
 #os.chdir('../TedBear-Web/zerospeech')
 #print(os.getcwd())
 #sys.path.append('//TedBear-Web/z')
-print(sys.path)
+#print(sys.path)
 
-from zerospeech.speechconvert import get_converted_audio
-get_converted_audio('','','')
+#from zerospeech.speechconvert import get_converted_audio
+#get_converted_audio('','','')
 @app.route('/')
 @app.route('/home')
 def home():

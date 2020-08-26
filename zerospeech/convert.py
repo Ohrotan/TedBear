@@ -9,12 +9,15 @@ import numpy as np
 import librosa
 from tqdm import tqdm
 import pyloudnorm # 볼륨 평준화 라이브러리? 볼륨 조절할 때 쓰는 듯
+import os
 
+os.chdir('../TedBear-Web/zerospeech')
+print(os.getcwd())
 from preprocess import preemphasis
 from model import Encoder, Decoder
 
 
-@hydra.main(config_path="config/convert.yaml")
+@hydra.main(config_path="zerospeech/config/convert.yaml")
 def convert(cfg):
     dataset_path = Path(utils.to_absolute_path("datasets")) / cfg.dataset.path    #zerospeech/datasets/2019/english
     with open(dataset_path / "speakers.json") as file: # 말하는 사람들 이름 써있는 데이터

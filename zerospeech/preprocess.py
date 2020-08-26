@@ -11,8 +11,11 @@ from multiprocessing import cpu_count
 from concurrent.futures import ProcessPoolExecutor
 from functools import partial
 from tqdm import tqdm
+import os
 
 
+#os.chdir('zerospeech')
+print("pre",os.getcwd())
 def preemphasis(x, preemph):# 고주파에서의 잡음을 줄이기 위한 전처리라고 합니다
     return scipy.signal.lfilter([1, -preemph], [1], x)
 
@@ -64,7 +67,7 @@ def process_wav(wav_path, out_path, sr=160000, preemph=0.97, n_fft=2048, n_mels=
     return out_path, logmel.shape[-1]
 
 
-@hydra.main(config_path="config/preprocessing.yaml") 
+@hydra.main(config_path="zerospeech/config/preprocessing.yaml")
 # 기본 경로를 야믈형식으로 저장해뒀다. 이걸로 바로 해당 파일로 접근. 여기서 in_dir이 ??? 로 되어있음
  # 위의 confg_path의 파일의 모든 값이 함수의 인자로 들어오는 것
 def preprocess_dataset(cfg):
