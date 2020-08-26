@@ -5,5 +5,5 @@ defaults:
 
 synthesis_list: datasets/english/synthesis_list.json
 in_dir: ./
-out_dir: submissiontest/english/result
+out_dir: result
 checkpoint: checkpoints/model.ckpt-500000.pt
