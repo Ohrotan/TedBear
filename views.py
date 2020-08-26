@@ -7,9 +7,8 @@ from init import app, db_session
 from models import Talks, WatchingRecord, Sentence, ShadowingRecord
 import ast
 from flask import Flask, jsonify, request, session, redirect
-
-print(os.getcwd())
 import hydra
+print(os.getcwd())
 from zerospeech import preprocess
 from zerospeech import convert
 from zerospeech import editconfig
@@ -25,7 +24,6 @@ def get_converted_audio(user_id, user_audio_path, org_audio_path) : #아래 함�
     hydra._internal.hydra.GlobalHydra().clear()
     convert.convert()
     hydra._internal.hydra.GlobalHydra().clear()
-
 
 
 @app.route('/')
@@ -94,6 +92,7 @@ def history():
 
 @app.route('/upload', methods=['POST'])
 def upload_record():
+    get_converted_audio('kang1', './english/train/voice/', './english/test/')
     f = request.files['audio_data']
     filename = './' + str(session['id']) + '_' + request.form['talks_id'] + '_' + request.form['sentence_id'] + '.wav'
     with open(filename, 'wb') as audio:
@@ -104,7 +103,8 @@ def upload_record():
     print('file uploaded successfully')
 
     # 여기서 음성파일 올리고, 음성 컨버트 시키고 평가하기
-    get_converted_audio('kang1', './english/train/voice/', './english/test/')
+
+
     # 평가한 이미지파일, 컨버트 결과 파일 DB에 넣기
 
     s_record = ShadowingRecord(user_id=session['id'], talks_id=request.form['talks_id'], \
