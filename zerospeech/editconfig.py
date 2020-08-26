@@ -22,6 +22,7 @@ def speaker_json(user_audio_path, org_audio_path):
 
     file_list =os.listdir(path_dir) #경로 읽어 파일명 리스트 만들기
     file_list.sort() #정렬
+
     with open("./datasets/english/speakers.json", "r") as st_json: #json 파일 읽기
         speakers = json.load(st_json)
         for i in file_list:

@@ -11,10 +11,11 @@ from tqdm import tqdm
 import pyloudnorm # 볼륨 평준화 라이브러리? 볼륨 조절할 때 쓰는 듯
 import os
 
-os.chdir('../TedBear-Web/zerospeech')
 print(os.getcwd())
-from preprocess import preemphasis
-from model import Encoder, Decoder
+from zerospeech import preprocess
+#from preprocess import preemphasis
+from zerospeech import model
+#from model import Encoder, Decoder
 
 
 @hydra.main(config_path="zerospeech/config/convert.yaml")
@@ -33,8 +34,8 @@ def convert(cfg):
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # gpu안되면 cpu로
 
-    encoder = Encoder(**cfg.model.encoder) #ZeroSpeech/config/model/default에 있는 encoder
-    decoder = Decoder(**cfg.model.decoder) #ZeroSpeech/config/model/default에 있는 decoder
+    encoder = model.Encoder(**cfg.model.encoder) #ZeroSpeech/config/model/default에 있는 encoder
+    decoder = model.Decoder(**cfg.model.decoder) #ZeroSpeech/config/model/default에 있는 decoder
     encoder.to(device) # cpu or gpu
     decoder.to(device) # cpu or gpu
 
@@ -58,7 +59,7 @@ def convert(cfg):
         wav = wav / np.abs(wav).max() * 0.999 
 
         mel = librosa.feature.melspectrogram(
-            preemphasis(wav, cfg.preprocessing.preemph),
+            preprocess.preemphasis(wav, cfg.preprocessing.preemph),
             sr=cfg.preprocessing.sr,
             n_fft=cfg.preprocessing.n_fft,
             n_mels=cfg.preprocessing.n_mels,

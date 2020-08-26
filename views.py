@@ -10,19 +10,23 @@ from flask import Flask, jsonify, request, session, redirect
 
 print(os.getcwd())
 from zerospeech import preprocess
-#os.chdir('../TedBear-Web/zerospeech')
-print(os.getcwd())
-preprocess.preprocess_dataset()
-import sys
+from zerospeech import convert
+from zerospeech import editconfig
 
-#sys.path.append('./zerospeech')
-#os.chdir('../TedBear-Web/zerospeech')
-#print(os.getcwd())
-#sys.path.append('//TedBear-Web/z')
-#print(sys.path)
 
-#from zerospeech.speechconvert import get_converted_audio
-#get_converted_audio('','','')
+
+def get_converted_audio(user_id, user_audio_path, org_audio_path) : #아래 함수들을 한번에 실행
+    editconfig.speaker_json(user_audio_path, org_audio_path)
+    editconfig.train_json(user_audio_path)
+    editconfig.test_json(org_audio_path)
+    editconfig.synthesis_json(user_id, org_audio_path)
+    preprocess.preprocess_dataset()
+    hydra._internal.hydra.GlobalHydra().clear()
+    convert.convert()
+    hydra._internal.hydra.GlobalHydra().clear()
+
+get_converted_audio('kang1','english/train/voice/','./english/test/')
+
 @app.route('/')
 @app.route('/home')
 def home():

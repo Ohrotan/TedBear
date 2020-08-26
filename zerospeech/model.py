@@ -6,7 +6,8 @@ from torch.distributions import Categorical # 다항분포
 
 from tqdm import tqdm # for문 돌아갈떄 확인해주는 패키지임 (print로 확인하고 그런거)
 import numpy as np
-from preprocess import mulaw_decode  # https://en.wikipedia.org/wiki/%CE%9C-law_algorithm 8비트 16비트 그런거 맞춰주는과정이라는데
+from zerospeech import preprocess
+#from preprocess import mulaw_decode  # https://en.wikipedia.org/wiki/%CE%9C-law_algorithm 8비트 16비트 그런거 맞춰주는과정이라는데
 
 
 def get_gru_cell(gru):
@@ -212,5 +213,5 @@ class Decoder(nn.Module):
             output.append(2 * x.float().item() / (self.quantization_channels - 1.) - 1.)
 
         output = np.asarray(output, dtype=np.float64)
-        output = mulaw_decode(output, self.quantization_channels)
+        output = preprocess.mulaw_decode(output, self.quantization_channels)
         return output

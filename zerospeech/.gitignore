@@ -116,7 +116,7 @@ venv.bak/
 
 # Submission
 submission/
-*.wav
+#*.wav
 submission.zip
 
 # Hydra outputs

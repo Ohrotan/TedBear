@@ -2,10 +2,8 @@
 # coding: utf-8
 
 import os
-
-os.chdir('../TedBear-Web/zerospeech')
-print(os.getcwd())
-from preprocess import preprocess
+print("speech convert:",os.getcwd())
+#import preprocess
 import convert
 import hydra
 import editconfig

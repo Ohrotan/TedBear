@@ -4,5 +4,17 @@
 		0.0,
 		5.0,
 		"english/test/77/77_10"
+	],
+	[
+		"glish/test/77_10",
+		0.0,
+		3.0,
+		"glish/test/77/77_10"
+	],
+	[
+		"english/test/77_10",
+		0.0,
+		3.0,
+		"english/test/77/77_10"
 	]
 ]
