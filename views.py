@@ -9,6 +9,7 @@ import ast
 from flask import Flask, jsonify, request, session, redirect
 
 print(os.getcwd())
+import hydra
 from zerospeech import preprocess
 from zerospeech import convert
 from zerospeech import editconfig
@@ -25,7 +26,7 @@ def get_converted_audio(user_id, user_audio_path, org_audio_path) : #아래 함�
     convert.convert()
     hydra._internal.hydra.GlobalHydra().clear()
 
-get_converted_audio('kang1','english/train/voice/','./english/test/')
+get_converted_audio('kang1','./english/train/voice/','./english/test/')
 
 @app.route('/')
 @app.route('/home')
