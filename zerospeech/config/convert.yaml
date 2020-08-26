@@ -3,7 +3,7 @@ defaults:
     - preprocessing: default
     - model: default
 
-synthesis_list: ???
-in_dir: ???
-out_dir: ???
-checkpoint: ???
+synthesis_list: datasets/english/synthesis_list.json
+in_dir: ./
+out_dir: submissiontest/english/result
+checkpoint: checkpoints/model.ckpt-500000.pt

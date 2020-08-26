@@ -2,4 +2,4 @@ defaults:
     - dataset: english
     - preprocessing: default
 
-in_dir: ???
+in_dir: ./

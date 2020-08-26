@@ -48,7 +48,7 @@ def speaker_json(user_audio_path, org_audio_path):
     with open("./datasets/english/speakers.json", 'w', encoding='utf-8') as make_file:
 
         json.dump(speakers, make_file, indent="\t") #추가성공
-
+    print('speakers success')
     
 
 def train_json(user_audio_path): # 유저 정보를 기록하는 train.json 수정하기
@@ -75,7 +75,7 @@ def train_json(user_audio_path): # 유저 정보를 기록하는 train.json 수�
     with open("./datasets/english/train.json", 'w', encoding='utf-8') as make_file:
 
         json.dump(train, make_file, indent="\t") #json에 추가 완료
-
+    print('train success')
 
 def test_json(org_audio_path): # ted오디오의 정보를 기록하는 test.json 수정
     path_dir =  str(org_audio_path)#경로 끝에 / 꼭 붙이기
@@ -100,7 +100,7 @@ def test_json(org_audio_path): # ted오디오의 정보를 기록하는 test.jso
     with open("./datasets/english/test.json", 'w', encoding='utf-8') as make_file:
 
         json.dump(test, make_file, indent="\t")  #json에 추가 완료
-
+    print('test success')
 
 def synthesis_json(user_id, org_audio_path): # 음성 합성할 때 쓸 synthesis_list.json 변경
     user_name=str(user_id) #user_id로 speaker이용
@@ -121,4 +121,4 @@ def synthesis_json(user_id, org_audio_path): # 음성 합성할 때 쓸 synthesi
     with open("./datasets/english/synthesis_list.json", 'w', encoding='utf-8') as make_file:
 
         json.dump(synthesis, make_file, indent="\t") # 추가 완료
-
+    print('synthesis success')
