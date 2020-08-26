@@ -10,14 +10,14 @@
                 <!-- Request Form -->
                 <div>
                     <form id="requestForm" action="/login" method="post">
-{{ msg }}
+                        {{ msg }}
                         <div class="form-group">
                             <input type="email" class="form-control-input" id="remail" name="remail" required>
                             <label class="label-control" for="remail">Email</label>
                             <div class="help-block with-errors"></div>
                         </div>
                         <div class="form-group">
-                            <input type="text" class="form-control-input" id="rpwd" name="rpwd" required>
+                            <input type="password" class="form-control-input" id="rpwd" name="rpwd" required>
                             <label class="label-control" for="rpwd">Password</label>
                             <div class="help-block with-errors"></div>
                         </div>
@@ -25,7 +25,7 @@
                             <div id="rmsgSubmit" class="h3 text-center hidden"></div>
                         </div>
                         <div class="form-group">
-                            <button type="submit" class="form-control-submit-button">LOGIN</button>
+                            <button type="submit" class="form-control-submit-button" onclick="sha256()">LOGIN</button>
                         </div>
                         <div class="form-group">
                             <a class=" btn-solid-second page-scroll" href="./register.html"
@@ -42,5 +42,17 @@
 </div> <!-- end of cards-2 -->
 <!-- end of pricing -->
 
+<script>
+    async function sha256(e) {
+        pwd = document.getElementById("rpwd").value
 
+        const msgBuffer = new TextEncoder('utf-8').encode(pwd);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+
+        const hashHex = hashArray.map(b => ('00' + b.toString(16)).slice(-2)).join('');
+        document.getElementById("rpwd").value = hashHex;
+
+    }
+</script>
 {% include 'footer.html' %}

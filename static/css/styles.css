@@ -40,7 +40,7 @@ Colors:
 - Text body - black #626262
 ******************************************/
 :root{
-	--main-blue: #00bfd8;
+	--main-blue: #3cbec7;
 	--blue: #0079f9;
 	--main-yellow :#ffd662;
 
@@ -670,7 +670,7 @@ input[type='checkbox'] {
 }
 
 .navbar-custom .navbar-brand.logo-image img {
-    width: 7.4375rem;
+
 	height: 2rem;
 }
 
@@ -687,7 +687,7 @@ input[type='checkbox'] {
 
 .navbar-custom .nav-item .nav-link {
 	padding: 0.625rem 0.75rem 0.625rem 0.75rem;
-	color: var(--blue) !important;
+	color: var(--gray3) !important;
 	text-decoration: none;
 	transition: all 0.2s ease;
 }
@@ -759,7 +759,7 @@ input[type='checkbox'] {
 .navbar-custom .navbar-toggler {
 	border: none;
 	color: var(--gray4);
-	font-size: 2rem;
+	font-size: 1rem;
 }
 
 .navbar-custom button[aria-expanded='false'] .navbar-toggler-awesome.fas.fa-times{

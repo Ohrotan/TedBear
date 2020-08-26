@@ -2,21 +2,50 @@
 Routes and views for the flask application.
 """
 import os
-from datetime import datetime
 from flask import render_template
 from init import app, db_session
-from models import User, Talks, WatchingRecord, Sentence, ShadowingRecord
-from jinja2 import Template
+from models import Talks, WatchingRecord, Sentence, ShadowingRecord
 import ast
 from flask import Flask, jsonify, request, session, redirect
-from sqlalchemy import create_engine, text
+
+import importlib
+import pkgutil
 
 
+def import_submodules(package, recursive=True):
+    """ Import all submodules of a module, recursively, including subpackages
+
+    :param package: package (name or actual module)
+    :type package: str | module
+    :rtype: dict[str, types.ModuleType]
+    """
+    if isinstance(package, str):
+        package = importlib.import_module(package)
+    results = {}
+    for loader, name, is_pkg in pkgutil.walk_packages(package.__path__):
+        full_name = package.__name__ + '.' + name
+        results[full_name] = importlib.import_module(full_name)
+        if recursive and is_pkg:
+            results.update(import_submodules(full_name))
+    return results
+
+import zerospeech
+import_submodules(zerospeech)
+import sys
+#sys.path.append('./zerospeech')
+#os.chdir('../TedBear-Web/zerospeech')
+#print(os.getcwd())
+#sys.path.append('//TedBear-Web/z')
+print(sys.path)
+
+from zerospeech.speechconvert import get_converted_audio
+get_converted_audio('','','')
 @app.route('/')
 @app.route('/home')
 def home():
+
     has_transcript_id = "SELECT distinct(talks_id) FROM sentence"
-    sql_query ="SELECT * FROM talks WHERE id in "+has_transcript_id
+    sql_query = "SELECT * FROM talks WHERE id in " + has_transcript_id
     valid_talks_id = app.database.execute(has_transcript_id).fetchall()
 
     valid_talks_id = [a['talks_id'] for a in valid_talks_id]
@@ -27,6 +56,8 @@ def home():
     for talks in originlist:
         talks.topic = ast.literal_eval(talks.topics)[0]
         video_list.append(talks)
+
+
     try:
         if session['name']:
             return render_template(
@@ -74,7 +105,7 @@ def history():
 
 
 @app.route('/upload', methods=['POST'])
-def upload():
+def upload_record():
     f = request.files['audio_data']
     filename = './' + str(session['id']) + '_' + request.form['talks_id'] + '_' + request.form['sentence_id'] + '.wav'
     with open(filename, 'wb') as audio:
@@ -134,40 +165,31 @@ def shadowing(talks_id):
     )
 
 
-@app.route('/next_sentence', methods=['POST'])
+@app.route('/move_sentence', methods=['POST'])
 def next_sentence():
     num = request.form['transcript_index']
-    if num == len(transcript) - 1:
+    if request.form['next'] == "true":
+        num = int(num) + 1
+    else:
+        num = int(num) - 1
+    if num == len(transcript) or num < 0:
         return 'fail'
 
-    result = transcript[int(num) + 1].__dict__
+    result = transcript[num].__dict__
     result['audio'] = ''
     result['sentence_kr'] = ''
     try:
         del result['_sa_instance_state']
     except:
-        v = 1
-    return result
+        print('view.py move_sentence')
 
-
-@app.route('/prev_sentence', methods=['POST'])
-def prev_sentence():
-    num = request.form['transcript_index']
-    if num == 0:
-        return 'fail'
-    result = transcript[int(num) - 1].__dict__
-    result['audio'] = ''
-    result['sentence_kr'] = ''
-    try:
-        del result['_sa_instance_state']
-    except:
-        v = 1
     return result
 
 
 @app.route('/record')
 def record():
     # 사용자 오디오 파일 서버에 저장
+
     return
 
 

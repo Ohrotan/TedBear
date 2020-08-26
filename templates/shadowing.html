@@ -64,11 +64,11 @@
                 <ol id="recordingsList"></ol>
 
                 <div>
-                    <span id="prev-btn" onclick="prevSentence()">
+                    <span id="prev-btn" onclick="moveSentence(false)">
                         <img class="btn-img" src="/static/images/left.png">
                            이전 문장
                     </span>
-                    <span id="next-btn" onclick="nextSentence()">
+                    <span id="next-btn" onclick="moveSentence(true)">
                         다음 문장
                         <img class="btn-img" src="/static/images/right.png">
                     </span>
@@ -96,14 +96,12 @@
     //    after the API code downloads.
 
 
-
     var transcript_index = {{ transcript_index }};
 
     var player;
-    {% set time = transcript[transcript_index].start_time + talks_info.youtube_gap %}
-    var gap =
-    {{ talks_info.youtube_gap }}
-    var start_time = {{ time }};
+    var gap = {{ talks_info.youtube_gap }};
+    var start_time = {{ transcript[transcript_index].start_time }} +gap;
+
 
     var duration = {{ transcript[transcript_index].duration }};
     var timer = false;
@@ -116,7 +114,7 @@
             height: '360',
             width: '640',
             videoId: '{{ talks_info.yt_url }}',
-            playerVars: {'autoplay': 0, 'controls': 1, 'loop': 1, 'modestbranding': 1, 'rel': 0},
+            playerVars: {'autoplay': 0, 'controls': 0, 'loop': 1, 'modestbranding': 1, 'rel': 0},
             events: {
                 'onReady': onPlayerReady,
                 'onStateChange': onPlayerStateChange
@@ -135,7 +133,6 @@
     // 5. The API calls this function when the player's state changes.
     //    The function indicates that when playing a video (state=1),
     //    the player should play for six seconds and then stop.
-
 
 
     function onPlayerStateChange(event) {
@@ -182,7 +179,7 @@
     });
 
 
-    function prevSentence() {
+    function moveSentence(next) {
 
         var xhr = new XMLHttpRequest();
         xhr.onload = function (e) {
@@ -198,7 +195,12 @@
                 start_time = sentence['start_time'] + gap
                 console.log(sentence['start_time'])
                 duration = sentence['duration']
-                document.getElementById("transcript_index").value = --transcript_index
+                if (next == true) {
+                    ++transcript_index
+                } else {
+                    --transcript_index
+                }
+                document.getElementById("transcript_index").value = transcript_index
                 document.getElementById("sentence_id").value = sentence['id']
                 console.log(player.getPlayerState())
                 if (player.getPlayerState() == 1) {
@@ -213,48 +215,22 @@
             }
         };
         var fd = new FormData();
+        if (next == true) {
+            fd.append("next", "true");
+        } else {
+            fd.append("next", "false");
+        }
         fd.append("transcript_index", document.getElementById("transcript_index").value);
-        xhr.open("POST", "/prev_sentence", true);
+        xhr.open("POST", "/move_sentence", true);
         xhr.send(fd);
 
     }
 
-    function nextSentence() {
-
-        var xhr = new XMLHttpRequest();
-        xhr.onload = function (e) {
-            if (this.readyState === 4) {
-                console.log("Server returned: ", e.target.responseText);
-                sentence = e.target.responseText
-                sentence = JSON.parse(sentence)
-                document.getElementById("sentence_en").textContent = sentence['sentence_en']
-                document.getElementById("sentence_kr").textContent = sentence['sentence_kr']
-                start_time = sentence['start_time'] + gap
-                duration = sentence['duration']
-                document.getElementById("transcript_index").value = ++transcript_index
-                document.getElementById("sentence_id").value = sentence['id']
-
-                 console.log(player.getPlayerState())
-                if (player.getPlayerState() == 1) {
-                    console.log('pause and play')
-                    pause()
-                    play()
-                } else {
-                    seekToStart()
-                }
-            }
-        };
-        var fd = new FormData();
-        fd.append("transcript_index", document.getElementById("transcript_index").value);
-        xhr.open("POST", "/next_sentence", true);
-        xhr.send(fd);
-
-    }
-    function convert(){
-        $("#convert-btn")[0].innerText="변환 중..."
+    function convert() {
+        $("#convert-btn")[0].innerText = "변환 중..."
         /**
          var xhr = new XMLHttpRequest();
-        xhr.onload = function (e) {
+         xhr.onload = function (e) {
             if (this.readyState === 4) {
                 console.log("Server returned: ", e.target.responseText);
                 sentence = e.target.responseText
@@ -270,12 +246,12 @@
                 seekToStart()
             }
         };
-        var fd = new FormData();
-        fd.append("transcript_index", document.getElementById("transcript_index").value);
-        xhr.open("POST", "/convert", true);
-        xhr.send(fd);
+         var fd = new FormData();
+         fd.append("transcript_index", document.getElementById("transcript_index").value);
+         xhr.open("POST", "/convert", true);
+         xhr.send(fd);
 
-    }
+         }
          **/
     }
 </script>
