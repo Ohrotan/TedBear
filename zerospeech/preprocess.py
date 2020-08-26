@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 import hydra
 #커맨드라인 처리,Config 관리,원격실행,로깅 등의 귀찮은 부분을 대신함.
 from hydra import utils

@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 import hydra
 from hydra import utils
 from itertools import chain
