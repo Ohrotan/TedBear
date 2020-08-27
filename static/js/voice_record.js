@@ -163,6 +163,7 @@ function createDownloadLink(blob) {
         fd.append("audio_data", blob, filename);
         fd.append("talks_id",document.getElementById("talks_id").value);
         fd.append("sentence_id",document.getElementById("sentence_id").value);
+        fd.append("transcript_index",document.getElementById("transcript_index").value);
         xhr.open("POST", "/upload", true);
         xhr.send(fd);
     })

@@ -9,13 +9,14 @@ import ast
 from flask import Flask, jsonify, request, session, redirect
 import hydra
 
+import asyncio
+
 from zerospeech import convert
 from zerospeech import editconfig
 from evalspeech import evaluate
 
-evaluate.eval('./zerospeech/english/test/77_10.wav','./zerospeech/english/train/voice/1_4_4486.wav','./evalspeech/graph/')
 
-def get_converted_audio(user_id, user_audio_path, org_audio_path):  # 아래 함수들을 한번에 실행
+async def get_converted_audio(user_id, start_transcript, end_transcript, user_audio_path, org_audio_path):  # 아래 함수들을 한번에 실행
     editconfig.speaker_json(user_audio_path, org_audio_path)
     editconfig.train_json(user_audio_path)
     editconfig.test_json(org_audio_path)
@@ -64,16 +65,16 @@ def history():
     except:
         return redirect('/home')
 
-    originlist = db_session.query(WatchingRecord,Talks).filter(
-        WatchingRecord.user_id == user_id,WatchingRecord.talks_id == Talks.id).all()
-    #watching_list = WatchingRecord.query.join(Talks, WatchingRecord.talks_id == Talks.id).filter(
+    originlist = db_session.query(WatchingRecord, Talks).filter(
+        WatchingRecord.user_id == user_id, WatchingRecord.talks_id == Talks.id).all()
+    # watching_list = WatchingRecord.query.join(Talks, WatchingRecord.talks_id == Talks.id).filter(
     #    WatchingRecord.user_id == user_id).all()
 
     # originlist = app.database.execute(
     #    'SELECT a.talks_title,a.last_time,b.topics,b.speaker,b.image,b.id FROM watching_record as a join talks as b on b.id=a.talks_id '
     #    'where a.user_id=%s', (user_id)).fetchall()
     percent = []
-    watching_list =[]
+    watching_list = []
     for info in originlist:
         talks_info = info[1]
         talks_info.topic = ast.literal_eval(talks_info.topics)[0]
@@ -84,7 +85,7 @@ def history():
             percent.append(0)
         else:
             done = ShadowingRecord.query.filter_by(talks_id=talks_info.id, user_id=session['id']).count()
-            percent.append(done/all)
+            percent.append(done / all)
 
         '''
         sentences = list(app.database.execute(
@@ -97,7 +98,7 @@ def history():
         print(sqllist)
         '''
     return render_template(
-        'history.html', watching_list=watching_list,percent=percent
+        'history.html', watching_list=watching_list, percent=percent
     )
 
 
@@ -105,7 +106,8 @@ def history():
 def upload_record():
     f = request.files['audio_data']
     filename = './english/train/voice/' + str(session['id']) + '_' + request.form['talks_id'] + '_' + request.form[
-        'sentence_id'] + '.wav'
+        'transcript_index'] + '.wav'
+    origin_name = './english/test/' + request.form['talks_id'] + '_' + request.form['transcript_index'] + '.wav'
     with open(filename, 'wb') as audio:
         f.save(audio)
     if os.path.isfile(filename):
@@ -113,10 +115,8 @@ def upload_record():
         print("user audio file path:", os.path.abspath(filename))
     print('file uploaded successfully')
 
-    # 여기서 음성파일 올리고, 음성 컨버트 시키고 평가하기
-    get_converted_audio(str(session['id']), './english/train/voice/', './english/test/')
-
     # 평가한 이미지파일, 컨버트 결과 파일 DB에 넣기
+    evaluate.eval(filename, origin_name, './evalspeech/graph/')
 
     s_record = ShadowingRecord(user_id=session['id'], talks_id=request.form['talks_id'], \
                                sentence_id=request.form['sentence_id'], user_audio=os.path.abspath(filename)
@@ -137,7 +137,6 @@ def shadowing(talks_id):
     transcript_index = 0
 
     # 사용자 히스토리 기록
-
     try:
         if session['id'] is None or len(transcript) == 0:
             return redirect('/')
@@ -158,6 +157,10 @@ def shadowing(talks_id):
 
     if talks_info.youtube_gap is None:
         talks_info.youtube_gap = 0
+
+    # 사용자 목소리로 컨버트 시키기 비동기처리하기
+    # 77_1, 77_10
+    # get_converted_audio(str(session['id']), "77_1", "77_10", './english/train/voice/', './english/test/')
 
     return render_template(
         'shadowing.html',
@@ -188,11 +191,11 @@ def next_sentence():
     return result
 
 
-@app.route('/record',methods=['GET','POST'])
+@app.route('/record', methods=['GET', 'POST'])
 def record():
     # 사용자 오디오 파일 서버에 저장
     transcript = Sentence.query.filter_by(talks_id=77).limit(5).all()
-    return render_template('record.html',transcript=transcript)
+    return render_template('record.html', transcript=transcript)
 
 
 @app.route('/logout')

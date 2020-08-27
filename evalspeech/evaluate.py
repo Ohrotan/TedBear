@@ -222,9 +222,6 @@ def wer(r, h):
     print('D: 놓친단어, S: 잘못말한 단어, I: 원본에 없는 단어')
     return  result
 
-
-
-
 def preprocess(ted_audio_path,user_audio_path,png_save_path):
     ted,sr=librosa.load(ted_audio_path,sr=16000) # ted는 amplitude ,sr은 sample rate 16000고정
     abs_ted=abs(ted) # amplitude에 절대값취하기
@@ -833,15 +830,4 @@ def eval_total(speed_result,strength_result,pitch_result,pronounciation_result):
 def eval(ted_audio_path,user_audio_path,png_save_path):
     first_local_maximum_you,first_local_maximum_ted,df,df1 = preprocess(ted_audio_path,user_audio_path,png_save_path)
     return eval_speed(first_local_maximum_ted, first_local_maximum_you,df,df1),eval_strength(first_local_maximum_ted, first_local_maximum_you,df,df1,png_save_path),eval_pitch(ted_audio_path,user_audio_path,png_save_path),eval_pronounciation(ted_audio_path,user_audio_path),eval_total(speed_result,strength_result,pitch_result,pronounciation_result)
-
-
-
-
-
-
-
-
-
-
-
 
