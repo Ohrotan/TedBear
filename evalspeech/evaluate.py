@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[29]:
 
 
 
@@ -21,8 +20,6 @@ import warnings
 warnings.filterwarnings("ignore")
 import copy
 
-
-# In[30]:
 
 
 import speech_recognition as sr9
@@ -59,7 +56,6 @@ def get_word_error_rate(r, h):
     return 100-result
 
 
-# In[31]:
 
 
 def editDistance(r, h):
@@ -227,7 +223,6 @@ def wer(r, h):
     return  result
 
 
-# In[32]:
 
 
 def preprocess(ted_audio_path,user_audio_path,png_save_path):
@@ -299,7 +294,6 @@ def preprocess(ted_audio_path,user_audio_path,png_save_path):
     return first_local_maximum_ted, first_local_maximum_you,df,df1
 
 
-# In[33]:
 
 
 def eval_speed(first_local_maximum_ted, first_local_maximum_you,df,df1):
@@ -357,10 +351,7 @@ def eval_speed(first_local_maximum_ted, first_local_maximum_you,df,df1):
     
 
 
-# In[34]:
-
-
-def eval_strength(first_local_maximum_ted, first_local_maximum_you,df,df1):
+def eval_strength(first_local_maximum_ted, first_local_maximum_you,df,df1,png_save_path):
     ## 이제 다 좌표찍는걸 그리는과정###                                    # 두음성 시작점 맞춰주는 과정
     if first_local_maximum_you>first_local_maximum_ted:                     ## A음성(first1)이 B음성(first)보다 음성이 늦게 시작한다면  
         diff= first_local_maximum_you-first_local_maximum_ted              # 두 음성 시작점 차이 구해가지고
@@ -523,10 +514,6 @@ def eval_strength(first_local_maximum_ted, first_local_maximum_you,df,df1):
     plt.tick_params(axis='x', which='both',bottom=False,top=False,labelbottom=False)
     plt.savefig(png_save_path+'strength_result.png')
     return strength_result_rate,strength_result
-
-
-# In[35]:
-
 
 # 음 높이 체크해주는 과정
 def eval_pitch(ted_audio_path,user_audio_path,png_save_path):
@@ -791,7 +778,6 @@ def eval_pitch(ted_audio_path,user_audio_path,png_save_path):
     return pitch_result_rate, pitch_result
 
 
-# In[36]:
 
 
 # 구글 stt와 문장 비교.
@@ -821,7 +807,7 @@ def eval_pronounciation(ted_audio_path,user_audio_path):
     return ted_answer, your_answer,result,pronounciation_result
 
 
-# In[37]:
+
 
 
 # 4개 평가항목 excelleent 3점 good 2점 bad1점 으로 총 평가점수
@@ -842,28 +828,19 @@ def eval_total(speed_result,strength_result,pitch_result,pronounciation_result):
     else:                              # 그 외
         total_result='Bad'
     return total_result
-            
-   
-    
-
-
-# In[38]:
-
 
 # 전체 함수 하나의 함수로 묶기
 def eval(ted_audio_path,user_audio_path,png_save_path):
     first_local_maximum_you,first_local_maximum_ted,df,df1 = preprocess(ted_audio_path,user_audio_path,png_save_path)
-    return eval_speed(first_local_maximum_ted, first_local_maximum_you,df,df1),eval_strength(first_local_maximum_ted, first_local_maximum_you,df,df1),eval_pitch(ted_audio_path,user_audio_path,png_save_path),eval_pronounciation(ted_audio_path,user_audio_path),eval_total(speed_result,strength_result,pitch_result,pronounciation_result)
-
-
-
-# In[ ]:
+    return eval_speed(first_local_maximum_ted, first_local_maximum_you,df,df1),eval_strength(first_local_maximum_ted, first_local_maximum_you,df,df1,png_save_path),eval_pitch(ted_audio_path,user_audio_path,png_save_path),eval_pronounciation(ted_audio_path,user_audio_path),eval_total(speed_result,strength_result,pitch_result,pronounciation_result)
 
 
 
 
 
-# In[ ]:
+
+
+
 
 
 
