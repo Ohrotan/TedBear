@@ -19,12 +19,11 @@ from googletrans import Translator
 #evaluate.eval('./zerospeech/english/test/77_10.wav','./zerospeech/english/train/voice/kang1_0124.wav','./evalspeech/graph/')
 
 
-
-async def get_converted_audio(user_id, start_transcript, end_transcript, user_audio_path, org_audio_path):  # 아래 함수들을 한번에 실행
+def get_converted_audio(user_id, user_audio_path, org_audio_path, start_transcript, end_transcript):  # 아래 함수들을 한번에 실행
     editconfig.speaker_json(user_audio_path, org_audio_path)
     editconfig.train_json(user_audio_path)
     editconfig.test_json(org_audio_path)
-    editconfig.synthesis_json(user_id, org_audio_path)
+    editconfig.synthesis_json(user_id, org_audio_path, start_transcript, end_transcript)
     convert.convert()
     hydra._internal.hydra.GlobalHydra().clear()
 
@@ -120,7 +119,7 @@ def upload_record():
     print('file uploaded successfully')
 
     # 평가한 이미지파일, 컨버트 결과 파일 DB에 넣기
-    evaluate.eval(filename, origin_name, './evalspeech/graph/')
+    evaluate.eval(filename, origin_name, '../evalspeech/graph/')
 
     s_record = ShadowingRecord(user_id=session['id'], talks_id=request.form['talks_id'], \
                                sentence_id=request.form['sentence_id'], user_audio=os.path.abspath(filename)
@@ -162,9 +161,10 @@ def shadowing(talks_id):
     if talks_info.youtube_gap is None:
         talks_info.youtube_gap = 0
 
+
     # 사용자 목소리로 컨버트 시키기 비동기처리하기
     # 77_1, 77_10
-    # get_converted_audio(str(session['id']), "77_1", "77_10", './english/train/voice/', './english/test/')
+    #get_converted_audio(str(session['id']), './english/train/voice/', './english/test/', "77_10", "77_10")
 
     return render_template(
         'shadowing.html',
