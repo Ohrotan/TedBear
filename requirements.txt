@@ -19,3 +19,4 @@ hydra-core==0.11.3
 pyloudnorm==0.1.0
 tensorboard==2.3.0
 importlib==1.0.4
+googletrans==3.0.0
