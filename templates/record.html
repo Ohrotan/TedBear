@@ -1,0 +1,90 @@
+{% include 'header.html' %}
+
+<!-- main -->
+<div class="basic-3">
+    <div class="container">
+        <div class="row">
+            <!-- Video -->
+            <div class="col-lg-6">
+
+                <h3>
+                    Read the scripts, please.
+                </h3>
+            <h4>&nbsp;</h4>
+                {% for i in transcript %}
+                <p class="transcript-en" >
+                     {{  i.sentence_en }}
+                </p>
+                {% endfor %}
+            </div>
+            <div class="col-lg-6">
+                <div class="row" style="margin-top: -0.4rem;">
+                    <span class="col-sm-12" id="rec-btn">
+                        <img class="video-btn" src="/static/images/mic.png">
+                        <span style="font-size: 2.3rem;vertical-align: middle;font-weight: 700;">RECORD</span>
+                    </span>
+                    <span class="col-sm-12 hide" id="speak-btn">
+                        <img class="video-btn" src="/static/images/speak.png">
+                        <span style="font-size: 2.3rem;vertical-align: middle;font-weight: 700;">SAVE</span>
+                    </span>
+                </div>
+
+                <div id="controls">
+                </div>
+                <div id="formats">&nbsp;</div>
+
+                <ol id="recordingsList"></ol>
+
+
+            </div><!-- end of col,Transcript -->
+        </div> <!-- end of row -->
+    </div> <!-- end of container -->
+</div> <!-- end of basic-3 -->
+<!-- end of main -->
+
+
+{% include 'footer.html' %}
+
+<script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
+<script src="/static/js/voice_record.js"></script>
+<script>
+
+    $("#rec-btn").on('click', function () {
+        $("#speak-btn").removeClass("hide")
+        $("#rec-btn").addClass("hide")
+    });
+    $("#speak-btn").on('click', function () {
+        $("#rec-btn").removeClass("hide")
+        $("#speak-btn").addClass("hide")
+    });
+
+
+    function convert() {
+        $("#convert-btn")[0].innerText = "변환 중..."
+        /**
+         var xhr = new XMLHttpRequest();
+         xhr.onload = function (e) {
+            if (this.readyState === 4) {
+                console.log("Server returned: ", e.target.responseText);
+                sentence = e.target.responseText
+                sentence = JSON.parse(sentence)
+
+                document.getElementById("sentence_en").textContent = sentence['sentence_en']
+                document.getElementById("sentence_kr").textContent = sentence['sentence_kr']
+                start_time = sentence['start_time'] + gap
+                duration = sentence['duration']
+                document.getElementById("transcript_index").value = ++transcript_index
+                document.getElementById("sentence_id").value = sentence['id']
+
+                seekToStart()
+            }
+        };
+         var fd = new FormData();
+         fd.append("transcript_index", document.getElementById("transcript_index").value);
+         xhr.open("POST", "/convert", true);
+         xhr.send(fd);
+
+         }
+         **/
+    }
+</script>

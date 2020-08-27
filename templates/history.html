@@ -15,29 +15,29 @@
 
                 <!-- Card-->
 
-                {% for i in sqllist %}
+                {% for i in watching_list %}
                     <div class="card">
                         <div class="label">
-                            <p class="category">{{ i[2] }}</p>
+                            <p class="category">{{ i['topic'] }}</p>
                         </div>
                         <div class="card-body">
-                            <div class="card-title ellipsis">{{ i[0] }}</div>
-                            <div class="card-subtitle">{{ i[3] }}</div>
+                            <div class="card-title ellipsis">{{ i['title'] }}</div>
+                            <div class="card-subtitle">{{ i['speaker'] }}</div>
                             <hr class="cell-divide-hr">
                             <div class="price">
                                 <div class="video-wrapper">
                                     <div style="max-width:854px">
                                         <div style="position:relative;height:0;padding-bottom:56.25%;
-                                                background: url({{ i[4] }});background-size: auto 100%;;">
+                                                background: url({{ i['image'] }});background-size: auto 100%;;">
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <hr class="cell-divide-hr">
-                            <span class="value">{{ (i[7]/i[6]*100)|round(1) }}</span><span class="percent">%</span>
+                            <span class="value">{{ percent[loop.index0] }}</span><span class="percent">%</span>
                             <div class="button-wrapper">
                                 <a class="btn-solid-second page-scroll" href="#request">RESULT</a>
-                                <a class="btn-solid-reg page-scroll" href="/shadowing/{{ i[5] }}">WATCH</a>
+                                <a class="btn-solid-reg page-scroll" href="/shadowing/{{ i['id'] }}">WATCH</a>
                             </div>
                         </div>
                     </div> <!-- end of card -->

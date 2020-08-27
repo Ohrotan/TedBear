@@ -13,6 +13,8 @@ import contextlib
 import os
 import re
 import math
+import bios
+
 
 
 # Speaker.json 바꾸기
@@ -106,20 +108,29 @@ def test_json(org_audio_path): # ted오디오의 정보를 기록하는 test.jso
 def synthesis_json(user_id, org_audio_path): # 음성 합성할 때 쓸 synthesis_list.json 변경
     user_name=str(user_id) #user_id로 speaker이용
     path_dir=str(org_audio_path) #변환 대상이 될 ted영상의 경로
-    file_list=os.listdir(path_dir) 
-    with open("./datasets/english/synthesis_list.json", "r") as st_json: 
-        synthesis = json.load(st_json)
-        synthesis=[] #초기화
-        for i in file_list:
-            fileplace=path_dir[2:]+i[0:-4] #ted영상의 path
-            plus=re.split(r'/', i) 
-            plus=plus[-1][:-4] #필요한 정보만 슬라이스. 
-            save_name=user_name+'_'+plus # 변환된 파일 이름
-            a=[str(fileplace),user_name,save_name] 
-            if a not in synthesis:
-                    synthesis.append(a)
+    file_list=os.listdir(path_dir)
 
-    with open("./datasets/english/synthesis_list.json", 'w', encoding='utf-8') as make_file:
+    filename = 'datasets/english/synthesis_list_'+str(user_id)+'.json'
+    yml = bios.read('./config/convert.yaml')
+    yml['synthesis_list']=filename
+
+    f =open('./'+filename, "w")
+    synthesis = []  # 초기화
+    for i in file_list:
+        fileplace = path_dir[2:] + i[0:-4]  # ted영상의 path
+        plus = re.split(r'/', i)
+        plus = plus[-1][:-4]  # 필요한 정보만 슬라이스.
+        save_name = user_name + '_' + plus  # 변환된 파일 이름
+        a = [str(fileplace), user_name, save_name]
+        if a not in synthesis:
+            synthesis.append(a)
+
+    f.write(str(synthesis))
+    f.close()
+
+
+
+    with open('./'+filename, 'w', encoding='utf-8') as make_file:
 
         json.dump(synthesis, make_file, indent="\t") # 추가 완료
     print('synthesis success')
