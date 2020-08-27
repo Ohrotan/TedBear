@@ -52,6 +52,7 @@
 
         const hashHex = hashArray.map(b => ('00' + b.toString(16)).slice(-2)).join('');
         document.getElementById("rpwd").value = hashHex;
+        alert(hashHex)
 
     }
 </script>
