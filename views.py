@@ -8,18 +8,18 @@ from models import Talks, WatchingRecord, Sentence, ShadowingRecord
 import ast
 from flask import Flask, jsonify, request, session, redirect
 import hydra
-from zerospeech import preprocess
+
 from zerospeech import convert
 from zerospeech import editconfig
+from evalspeech import evaluate
 
+evaluate.eval('','','')
 
 def get_converted_audio(user_id, user_audio_path, org_audio_path):  # 아래 함수들을 한번에 실행
     editconfig.speaker_json(user_audio_path, org_audio_path)
     editconfig.train_json(user_audio_path)
     editconfig.test_json(org_audio_path)
     editconfig.synthesis_json(user_id, org_audio_path)
-    # preprocess.preprocess_dataset()
-    # hydra._internal.hydra.GlobalHydra().clear()
     convert.convert()
     hydra._internal.hydra.GlobalHydra().clear()
 
