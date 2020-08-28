@@ -13,8 +13,8 @@ from zerospeech import convert
 from zerospeech import editconfig
 from evalspeech import evaluate
 
-evaluate.eval('','','')
 
+evaluate.eval('./zerospeech/english/test/77_10.wav','./zerospeech/english/train/voice/kang1_0124.wav','./evalspeech/graph/')
 def get_converted_audio(user_id, user_audio_path, org_audio_path):  # 아래 함수들을 한번에 실행
     editconfig.speaker_json(user_audio_path, org_audio_path)
     editconfig.train_json(user_audio_path)

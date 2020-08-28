@@ -360,7 +360,7 @@ def eval_speed(first_local_maximum_ted, first_local_maximum_you,df,df1):
 # In[34]:
 
 
-def eval_strength(first_local_maximum_ted, first_local_maximum_you,df,df1):
+def eval_strength(first_local_maximum_ted, first_local_maximum_you,df,df1,png_save_path) :
     ## 이제 다 좌표찍는걸 그리는과정###                                    # 두음성 시작점 맞춰주는 과정
     if first_local_maximum_you>first_local_maximum_ted:                     ## A음성(first1)이 B음성(first)보다 음성이 늦게 시작한다면  
         diff= first_local_maximum_you-first_local_maximum_ted              # 두 음성 시작점 차이 구해가지고
@@ -529,7 +529,7 @@ def eval_strength(first_local_maximum_ted, first_local_maximum_you,df,df1):
 
 
 # 음 높이 체크해주는 과정
-def eval_pitch(ted_audio_path,user_audio_path,png_save_path):
+def eval_pitch(ted_audio_path,user_audio_path ,png_save_path):
     sr, x = wavfile.read(ted_audio_path)                     # ted 목소리
     assert sr == 16000
     x = x.astype(np.float64)
@@ -853,7 +853,7 @@ def eval_total(speed_result,strength_result,pitch_result,pronounciation_result):
 # 전체 함수 하나의 함수로 묶기
 def eval(ted_audio_path,user_audio_path,png_save_path):
     first_local_maximum_you,first_local_maximum_ted,df,df1 = preprocess(ted_audio_path,user_audio_path,png_save_path)
-    return eval_speed(first_local_maximum_ted, first_local_maximum_you,df,df1),eval_strength(first_local_maximum_ted, first_local_maximum_you,df,df1),eval_pitch(ted_audio_path,user_audio_path,png_save_path),eval_pronounciation(ted_audio_path,user_audio_path),eval_total(speed_result,strength_result,pitch_result,pronounciation_result)
+    return eval_speed(first_local_maximum_ted, first_local_maximum_you,df,df1),eval_strength(first_local_maximum_ted, first_local_maximum_you,df,df1,png_save_path),eval_pitch(ted_audio_path,user_audio_path,png_save_path),eval_pronounciation(ted_audio_path,user_audio_path),eval_total(speed_result,strength_result,pitch_result,pronounciation_result)
 
 
 
