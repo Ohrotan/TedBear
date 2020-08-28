@@ -891,7 +891,7 @@ def eval(ted_audio_path, user_audio_path, png_save_path):
 # In[131]:
 
 
-eval(ted_audio_path, user_audio_path, png_save_path)
+#eval(ted_audio_path, user_audio_path, png_save_path)
 
 # In[ ]:
 

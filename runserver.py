@@ -6,10 +6,10 @@ from os import environ
 from init import app
 
 if __name__ == '__main__':
-    HOST = environ.get('SERVER_HOST', 'localhost')
+    HOST = environ.get('SERVER_HOST', '0.0.0.0')
     try:
-        PORT = int(environ.get('SERVER_PORT', '5555'))
+        PORT = int(environ.get('SERVER_PORT', '5000'))
     except ValueError:
-        PORT = 5555
+        PORT = 5000
     app.run(HOST, PORT, debug=True)
 
