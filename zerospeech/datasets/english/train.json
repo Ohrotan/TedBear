@@ -22,5 +22,29 @@
 		0.0,
 		0.0,
 		"english/train/1/1_4_4486"
+	],
+	[
+		"english/train/voice/kang1_0124",
+		0.0,
+		2.46,
+		"english/train/kang1/kang1_0124"
+	],
+	[
+		"english/train/voice/1_21_0",
+		0.0,
+		0.25,
+		"english/train/1/1_21_0"
+	],
+	[
+		"english/train/voice/1_4_0",
+		0.0,
+		1.02,
+		"english/train/1/1_4_0"
+	],
+	[
+		"english/train/voice/1_77_10",
+		0.0,
+		0.51,
+		"english/train/1/1_77_10"
 	]
 ]

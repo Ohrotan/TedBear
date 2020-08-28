@@ -1,20 +1,25 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[29]:
+# In[221]:
 
 
 
 import pandas as pd
 import librosa
 import matplotlib.pyplot as plt
+
 from scipy.ndimage import gaussian_filter1d
+
 import warnings
+
 warnings.filterwarnings("ignore")
+
 from numpy import dot
 from numpy.linalg import norm
 import numpy as np
-
+def cos_sim(A, B):
+       return dot(A, B)/(norm(A)*norm(B))
 import pysptk
 from scipy.io import wavfile
 import warnings
@@ -22,7 +27,8 @@ warnings.filterwarnings("ignore")
 import copy
 
 
-# In[30]:
+
+# In[222]:
 
 
 import speech_recognition as sr9
@@ -30,10 +36,6 @@ r = sr9.Recognizer()
 import nltk
 #nltk.download('punkt')  # 처음한번 필요
 from nltk.tokenize import word_tokenize
-
-
-def cos_sim(A, B):
-    return dot(A, B) / (norm(A) * norm(B))
 
 # sst 와 비교하여 error 구하는 과정
 def get_word_error_rate(r, h):
@@ -59,7 +61,7 @@ def get_word_error_rate(r, h):
     return 100-result
 
 
-# In[31]:
+# In[223]:
 
 
 def editDistance(r, h):
@@ -106,6 +108,8 @@ def getStepList(r, h, d):
 
 def alignedPrint(list, r, h, result):
     print("Speecher words:", end=" ")
+    prn1=[]
+    prn2=[]
     for i in range(len(list)):
         if list[i] == "i":
             count = 0
@@ -113,6 +117,7 @@ def alignedPrint(list, r, h, result):
                 if list[j] == "d":
                     count += 1
             index = i - count
+            prn1.append(h[index])
             print(" "*(len(h[index])), end=" ")
         elif list[i] == "s":
             count1 = 0
@@ -135,8 +140,12 @@ def alignedPrint(list, r, h, result):
                 if list[j] == "i":
                     count += 1
             index = i - count
+            prn2.append(i)
+            prn1.append(r[index])
             print(r[index], end=" "),
     print("\nShadowed words:", end=" ")
+    #print(prn1)
+    #print(prn2)
     for i in range(len(list)):
         if list[i] == "d":
             count = 0
@@ -217,7 +226,6 @@ def wer(r, h):
 
     # find out the manipulation steps
     list = getStepList(r, h, d)
-
     # print the result in aligned way
     result = float(d[len(r)][len(h)]) / len(r) * 100
     result=round(100-result,2)
@@ -227,7 +235,39 @@ def wer(r, h):
     return  result
 
 
-# In[32]:
+# In[224]:
+
+
+# 구글 stt와 문장 비교.
+def eval_pronounciation(ted_audio_path,user_audio_path):
+    r = sr9.Recognizer()
+    with sr9.AudioFile(ted_audio_path) as source:
+        audio = r.record(source)
+        ted_answer=r.recognize_google(audio)
+    answer=r.recognize_google(audio)
+    answer=answer.lower()
+    with sr9.AudioFile(user_audio_path) as source:
+        audio = r.record(source)
+        your_answer=r.recognize_google(audio)
+    mine=r.recognize_google(audio)
+    mine=mine.lower()
+    answer_token=word_tokenize(answer)
+    mine_token=word_tokenize(mine)
+    get_word_error_rate(mine_token,answer_token)
+    result=wer(mine_token,answer_token)
+    if result < 0:
+        result= 0
+    global pronounciation_result
+    if result>80:
+        pronounciation_result='Excellent'
+    elif result>60:
+        pronounciation_result='Good'
+    else:
+        pronounciation_result='Bad'    
+    return ted_answer, your_answer,result,pronounciation_result
+
+
+# In[225]:
 
 
 def preprocess(ted_audio_path,user_audio_path,png_save_path):
@@ -241,6 +281,8 @@ def preprocess(ted_audio_path,user_audio_path,png_save_path):
     abs_ted=list(abs_ted ) 
     while i < len(range(len(ted))):
         t=abs_ted[i:i+width_ted]       #t = 0부터 y길이까지 구간으로 자른 것
+        if t==[]:
+            break
         a=max(t)                 #  t 구간에서 가장큰값이 a에 저장됨
         b=t.index(a)             #   b= a값의 위치를 나타냄
         max_values_in_width.append(a)            # value리스트에 값저장 
@@ -255,7 +297,7 @@ def preprocess(ted_audio_path,user_audio_path,png_save_path):
     for i in range(len(loc_of_max_values_in_width)):       
         location=loc_of_max_values_in_width[i]
         empty_array_ted[location]=max_values_in_width[i]     # 아까 최대값 이었던 부분 대입 
-    first_local_maximum_ted=np.where(empty_array_ted>0.15)[0][0]      #뾰족뾰족 솟은 부분에서 0.15 보다 처음으로 높았던 부분 을 뽑음 (뒤에서필요) 
+    first_local_maximum_ted=np.where(empty_array_ted>0)[0][0]      #뾰족뾰족 솟은 부분에서 0.15 보다 처음으로 높았던 부분 을 뽑음 (뒤에서필요) 
     df=pd.DataFrame(empty_array_ted)                               
     df.interpolate(method='polynomial',order=2,inplace=True) # 이거는 직선 매끄럽게 깍아주려고 2차함수꼴로 바꿔줌
     df_list=list(df[0])        
@@ -273,6 +315,8 @@ def preprocess(ted_audio_path,user_audio_path,png_save_path):
     abs_you=list(abs_you)
     while i < len(range(len(you))):
         t1=abs_you[i:i+width_you]
+        if t1==[]:
+            break
         a1=max(t1)
         b1=t1.index(a1)
         max_values_in_width_1.append(a1)
@@ -289,7 +333,7 @@ def preprocess(ted_audio_path,user_audio_path,png_save_path):
     for i in range(len(loc_of_max_values_in_width_1)):
         location1=loc_of_max_values_in_width_1[i]
         empty_array_you[location1]=after_normalize[i]
-    first_local_maximum_you=np.where(empty_array_you>0.15)[0][0]
+    first_local_maximum_you=np.where(empty_array_you>0)[0][0]
     df1=pd.DataFrame(empty_array_you)        
     df1.interpolate(method='polynomial',order=2,inplace=True)
     df_list_you=list(df1[0])
@@ -299,14 +343,14 @@ def preprocess(ted_audio_path,user_audio_path,png_save_path):
     return first_local_maximum_ted, first_local_maximum_you,df,df1
 
 
-# In[33]:
+# In[226]:
 
 
 def eval_speed(first_local_maximum_ted, first_local_maximum_you,df,df1):
     if first_local_maximum_you>first_local_maximum_ted:                     ## A음성(first1)이 B음성(first)보다 음성이 늦게 시작한다면  
         diff= first_local_maximum_you-first_local_maximum_ted              # 두 음성 시작점 차이 구해가지고
         blue_ted=list(df[0])  # blue가 테드
-        orange_you=list(df1[0])# orange가 나
+        red_you=list(df1[0])# red가 나
         add=[0 for z in range(diff)]
         blue_ted_added=add+blue_ted                 
         df_ted_added=pd.DataFrame(blue_ted_added)
@@ -327,10 +371,10 @@ def eval_speed(first_local_maximum_ted, first_local_maximum_you,df,df1):
     elif first_local_maximum_you<=first_local_maximum_ted:
         diff=first_local_maximum_ted-first_local_maximum_you
         blue_ted=list(df[0])
-        orange_you=list(df1[0])
+        red_you=list(df1[0])
         add=[0 for z in range(diff)]
-        orange_you_added=add+orange_you # 내가짧은이까 더해줘서 orange1이생김
-        df_you_added=pd.DataFrame(orange_you_added)
+        red_you_added=add+red_you # 내가짧은이까 더해줘서 red1이생김
+        df_you_added=pd.DataFrame(red_you_added)
         # 테드가 첨부분은 더 나중에나옴  ,time_diff= 테드와 user의 시간 차이
         if len(df_you_added[0])>len(df[0]):    
             index_diff=abs((len(df_you_added[0])-(len(df[0]))))
@@ -357,15 +401,19 @@ def eval_speed(first_local_maximum_ted, first_local_maximum_you,df,df1):
     
 
 
-# In[34]:
+# In[227]:
 
 
+<<<<<<< HEAD
 def eval_strength(first_local_maximum_ted, first_local_maximum_you,df,df1,png_save_path) :
+=======
+def eval_strength(first_local_maximum_ted, first_local_maximum_you,df,df1,png_save_path):
+>>>>>>> 6ac6628f96f899b8aac638cbaf3bf65954887c0d
     ## 이제 다 좌표찍는걸 그리는과정###                                    # 두음성 시작점 맞춰주는 과정
     if first_local_maximum_you>first_local_maximum_ted:                     ## A음성(first1)이 B음성(first)보다 음성이 늦게 시작한다면  
         diff= first_local_maximum_you-first_local_maximum_ted              # 두 음성 시작점 차이 구해가지고
         blue_ted=list(df[0])  # blue가 테드
-        orange_you=list(df1[0])# orange가 나
+        red_you=list(df1[0])# red가 나
         add=[0 for z in range(diff)]
         blue_ted_added=add+blue_ted                 #  시작부분 맞춰주기위해 [0,0,0,0,] 벡터 더해줌
         df_ted_added=pd.DataFrame(blue_ted_added)
@@ -426,16 +474,16 @@ def eval_strength(first_local_maximum_ted, first_local_maximum_you,df,df1,png_sa
             points4=1-(sum(diffrent)/sum(ranks1))
             
             ##############################
-        orange_graph = gaussian_filter1d(df1[0], sigma=2)      # 이거도 뾰족부분 깍는과정인데 왜 두번들어가더라#
+        red_graph = gaussian_filter1d(df1[0], sigma=2)      # 이거도 뾰족부분 깍는과정인데 왜 두번들어가더라#
         blue_graph=df_ted_added[0]
     #테드 보다 user목소리가 더 빨리 시작할때 (반대과정)   위랑 
     elif first_local_maximum_you<=first_local_maximum_ted:
         diff=first_local_maximum_ted-first_local_maximum_you
         blue_ted=list(df[0])
-        orange_you=list(df1[0])
+        red_you=list(df1[0])
         add=[0 for z in range(diff)]
-        orange_you_added=add+orange_you # 내가짧은이까 더해줘서 orange1이생김
-        df_you_added=pd.DataFrame(orange_you_added)
+        red_you_added=add+red_you # 내가짧은이까 더해줘서 red1이생김
+        df_you_added=pd.DataFrame(red_you_added)
         # 테드가 첨부분은 ㄴ더 나중에나옴 
         if len(df_you_added[0])>len(df[0]):
             area =[]
@@ -466,9 +514,8 @@ def eval_strength(first_local_maximum_ted, first_local_maximum_you,df,df1,png_sa
             area =[]
             for z in range(first_local_maximum_ted,len(df_you_added[0]),1):
                     area.append(df[0][z])
-            points=1-(sum(abs(df1[0][first_local_maximum_ted:len(df_you_added[0])]-df_you_added[0][first_local_maximum_ted:len(df_you_added[0])]))/sum(area))
-            points3=cos_sim( df_you_added[0][first_local_maximum_ted:len(df_you_added[0])],df[0][first_local_maximum_ted:len(df_you_added[0])] )
-            
+            points=1-(sum(abs(df[0][first_local_maximum_ted:len(df_you_added[0])]-df_you_added[0][first_local_maximum_ted:len(df_you_added[0])]))/sum(area))
+            points3=cos_sim( df_you_added[0][first_local_maximum_ted:len(df_you_added[0])],df[0][first_local_maximum_ted:len(df_you_added[0])] )            
             ranks =[]
             for i in range(1,len(df[0])-1,1):
                 if df[0][i]>0.15:
@@ -489,17 +536,7 @@ def eval_strength(first_local_maximum_ted, first_local_maximum_you,df,df1,png_sa
             points4=1-(sum(diffrent)/sum(ranks))
         
         blue_graph=df[0]
-        orange_graph=df_you_added[0]
-        
-        #line1,=plt.plot(blue_graph,color='blue',linewidth=5)  
-        #line2,=plt.plot(orange_graph,color='orange',linewidth=5)
-        #plt.title('Strength Result',fontsize=50)
-        #plt.legend(handles=(line1,line2),labels=('Ted','You'),fontsize=20)
-        #plt.ylabel('Strength',fontsize=20)
-        #plt.tick_params(axis='x', which='both',bottom=False,top=False,labelbottom=False)
-        #plt.show()
-        #plt.savefig(png_save_path+'strength_result.png')
-    
+        red_graph=df_you_added[0] 
     result1=int(points*100)
     result4=int(points3*100)
     result5=int(points4*100)
@@ -515,8 +552,8 @@ def eval_strength(first_local_maximum_ted, first_local_maximum_you,df,df1,png_sa
     else:
         strength_result='Bad'
     plt.figure(figsize=(20,5));
-    line1,=plt.plot(blue_graph,color='blue',linewidth=5)  
-    line2,=plt.plot(orange_graph,color='orange',linewidth=5)
+    line1,=plt.plot(blue_graph,color='navy',linewidth=5)  
+    line2,=plt.plot(red_graph,color='crimson',linewidth=5)
     plt.title('Strength Result',fontsize=50)
     plt.legend(handles=(line1,line2),labels=('Ted','You'),fontsize=20)
     plt.ylabel('Strength',fontsize=20)
@@ -525,7 +562,7 @@ def eval_strength(first_local_maximum_ted, first_local_maximum_you,df,df1,png_sa
     return strength_result_rate,strength_result
 
 
-# In[35]:
+# In[228]:
 
 
 # 음 높이 체크해주는 과정
@@ -558,11 +595,13 @@ def eval_pitch(ted_audio_path,user_audio_path ,png_save_path):
         new_f0[np.where(new_f0<75)]=0
         value=[]
         loc=[]
-        c3=0                                              # 코랄  유 그린 테드
+        c3=0                                              
         i=0
         new_f0=list(new_f0)
         while i < len(range(len(new_f0))):
             ten=new_f0[i:i+width]
+            if ten==[]:
+                break
             a=max(ten)
             b=ten.index(a)
             value.append(a)
@@ -577,22 +616,19 @@ def eval_pitch(ted_audio_path,user_audio_path ,png_save_path):
         for i in range(len(loc)):
             location=loc[i]
             base[location]=value[i]
-        df_green=pd.DataFrame(base)                     
+        df_blue=pd.DataFrame(base)                     
         plt.figure(figsize=(20,5))
-        df_green.interpolate(method='polynomial',order=2,linewidth=2,inplace=True)
+        df_blue.interpolate(method='polynomial',order=2,linewidth=2,inplace=True)
 
-        bbb=list(df_green[0])
+        bbb=list(df_blue[0])
         ccc=list(map(lambda x: 0 if x<0 else x,bbb))
-        df_green[0]=ccc
-        df_green.fillna(0,inplace=True)
-        for g in range(len(df_green)):
-            if df_green[0][g]>max(f_ted)*1.2:
-                df_green[0][g]=max(f_ted)*1.2
+        df_blue[0]=ccc
+        df_blue.fillna(0,inplace=True)
+        for g in range(len(df_blue)):
+            if df_blue[0][g]>max(f_ted)*1.2:
+                df_blue[0][g]=max(f_ted)*1.2
         #합친게 you0
         you0=f_you
-        #you0=np.r_[f_you,np.zeros(len(new_f0)-len(f_you))]
-        cal1=copy.copy(you0)
-        cal1[np.where(you0<75)]=0
         you0[np.where(you0<75)]=0
         value1=[]
         loc1=[]
@@ -601,6 +637,8 @@ def eval_pitch(ted_audio_path,user_audio_path ,png_save_path):
         you0=list(you0)
         while i < len(range(len(you0))):
             ten1=you0[i1:i1+width1]
+            if ten1==[]:
+                break
             a1=max(ten1)
             b1=ten1.index(a1)
             value1.append(a1)
@@ -615,40 +653,39 @@ def eval_pitch(ted_audio_path,user_audio_path ,png_save_path):
         for i in range(len(loc1)):
             location1=loc1[i]
             base1[location1]=value1[i]
-        df_coral=pd.DataFrame(base1)
-        df_coral.interpolate(method='polynomial',order=2,linewidth=2,inplace=True)
-        bbb1=list(df_coral[0])
+        df_red=pd.DataFrame(base1)
+        df_red.interpolate(method='polynomial',order=2,linewidth=2,inplace=True)
+        bbb1=list(df_red[0])
         ccc1=list(map(lambda x: 0 if x<0 else x,bbb1))
-        df_coral[0]=ccc1
-        df_coral.fillna(0,inplace=True)
-        for h in range(len(df_coral)):
-            if df_coral[0][h]>max(f_you)*1.2:
-                df_coral[0][h]=max(f_you)*1.2
-        df_coral[0]=df_coral[0]*max(f_ted)/max(f_you)
-        
+        df_red[0]=ccc1
+        df_red.fillna(0,inplace=True)
+        for h in range(len(df_red)):
+            if df_red[0][h]>max(f_you)*1.2:
+                df_red[0][h]=max(f_you)*1.2
+        df_red[0]=df_red[0]*max(f_ted)/max(f_you)
         area= []
         diff_areas=[]
-        if len(df_coral[0])>len(df_green[0]):
-            for i in range(diff,len(df_green[0])):
-                area.append(df_green[0][i])
-                diff_areas.append(abs(df_coral[0][i]-df_green[0][i]))        
+        if len(df_red[0])>len(df_blue[0]):
+            for i in range(diff,len(df_blue[0])):
+                area.append(df_blue[0][i])
+                diff_areas.append(abs(df_red[0][i]-df_blue[0][i]))        
             result=1-(sum(diff_areas/sum(area)))
         else:
-            for i in range(diff,len(df_coral[0])):
-                area.append(df_green[0][i])
-                diff_areas.append(abs(df_coral[0][i]-df_green[0][i]))        
+            for i in range(diff,len(df_red[0])):
+                area.append(df_blue[0][i])
+                diff_areas.append(abs(df_red[0][i]-df_blue[0][i]))        
             result=1-(sum(diff_areas)/sum(area))
         
         ranks =[]
-        for i in range(1,len(df_green[0])-1,1):
-            if df_green[0][i]>60:
-                if df_green[0][i]>df_green[0][i-1] and df_green[0][i]>df_green[0][i+1]:
-                    ranks.append(df_green[0][i]/max(df_green[0]))    
+        for i in range(1,len(df_blue[0])-1,1):
+            if df_blue[0][i]>60:
+                if df_blue[0][i]>df_blue[0][i-1] and df_blue[0][i]>df_blue[0][i+1]:
+                    ranks.append(df_blue[0][i]/max(df_blue[0]))    
         ranks1=[]
-        for i in range(1,len(df_coral[0])-1,1):
-            if df_coral[0][i]>60:
-                if df_coral[0][i]>df_coral[0][i-1] and df_coral[0][i]>df_coral[0][i+1]:
-                    ranks1.append(df_coral[0][i]/max(df_coral[0]))
+        for i in range(1,len(df_red[0])-1,1):
+            if df_red[0][i]>60:
+                if df_red[0][i]>df_red[0][i-1] and df_red[0][i]>df_red[0][i+1]:
+                    ranks1.append(df_red[0][i]/max(df_red[0]))
         diffrent=[]
         if len(ranks)>len(ranks1):
             for i in range(len(ranks1)):
@@ -664,12 +701,8 @@ def eval_pitch(ted_audio_path,user_audio_path ,png_save_path):
         
     else:   # 테드가 더늦겟시작
         diff=np.where(f_ted>=60)[0][0]-np.where(f_you>=60)[0][0]
-       
         zero_ted=np.zeros(diff)
-        
         new_ted=np.r_[zero_ted,f_you]
-        cal_ted=copy.copy(new_ted)
-        cal_ted[np.where(cal_ted<75)]=0
         new_ted[np.where(new_ted<75)]=0
         value1=[]
         loc1=[]
@@ -678,6 +711,8 @@ def eval_pitch(ted_audio_path,user_audio_path ,png_save_path):
         new_ted=list(new_ted)
         while i1 < len(range(len(new_ted))):
             ten1=new_ted[i1:i1+width1]
+            if ten1==[]:
+                break
             a1=max(ten1)
             b1=ten1.index(a1)
             value1.append(a1)
@@ -692,18 +727,17 @@ def eval_pitch(ted_audio_path,user_audio_path ,png_save_path):
         for h in range(len(loc1)):
             location1=loc1[h]
             base[location1]=value1[h]
-        df_green=pd.DataFrame(base)
-        df_green.interpolate(method='polynomial',order=2,linewidth=2,inplace=True)
-        bbb=list(df_green[0])
+        df_blue=pd.DataFrame(base)
+        df_blue.interpolate(method='polynomial',order=2,linewidth=2,inplace=True)
+        bbb=list(df_blue[0])
         ccc=list(map(lambda x: 0 if x<0 else x ,bbb))
-        df_green[0]=ccc
-        df_green.fillna(0,inplace=True)
-        for g in range(len(df_green)):
-            if df_green[0][g]>max(f_you)*1.2:
-                df_green[0][g]=max(f_you)*1.2  
+        df_blue[0]=ccc
+        df_blue.fillna(0,inplace=True)
+        for g in range(len(df_blue)):
+            if df_blue[0][g]>max(f_you)*1.2:
+                df_blue[0][g]=max(f_you)*1.2  
         f_ted1=f_ted
-        #f_ted1=np.r_[f_ted,np.zeros(abs(len(new_ted)-len(f_ted)))]
-        cal2=copy.copy(f_ted1)                                              # 그린  유 코랄 테드
+        cal2=copy.copy(f_ted1)                                             
         cal2[np.where(f_ted1<75)]=0
         f_ted1[np.where(f_ted1<75)]=0
         value2=[]
@@ -713,6 +747,8 @@ def eval_pitch(ted_audio_path,user_audio_path ,png_save_path):
         f_ted1=list(f_ted1)
         while i2 <len(range(len(f_ted1))):
             ten2=f_ted1[i2:i2+width]
+            if ten2==[]:
+                break
             a2=max(ten2)
             b2=ten2.index(a2)
             value2.append(a2)
@@ -727,40 +763,39 @@ def eval_pitch(ted_audio_path,user_audio_path ,png_save_path):
         for i in range(len(loc2)):
             location2= loc2[i]
             base2[location2]=value2[i]
-        df_coral=pd.DataFrame(base2)
-        df_coral.interpolate(method='polynomial',order=2,linewidth=2,inplace=True)
-        bbb2=list(df_coral[0])
+        df_red=pd.DataFrame(base2)
+        df_red.interpolate(method='polynomial',order=2,linewidth=2,inplace=True)
+        bbb2=list(df_red[0])
         ccc2=list(map(lambda x:0 if x <0 else x , bbb2))
-        df_coral[0]=ccc2
-        df_coral.fillna(0,inplace=True)
-        for g in range(len(df_coral)):
-            if df_coral[0][g]>max(f_ted)*1.2:
-                df_coral[0][g]=max(f_ted)*1.2
-        df_green[0]=df_green[0]*max(f_ted)/max(f_you)        
-                
+        df_red[0]=ccc2
+        df_red.fillna(0,inplace=True)
+        for g in range(len(df_red)):
+            if df_red[0][g]>max(f_ted)*1.2:
+                df_red[0][g]=max(f_ted)*1.2
+        df_blue[0]=df_blue[0]*max(f_ted)/max(f_you)            
         area= []
         diff_areas=[]
-        if len(df_coral[0])>len(df_green[0]):
-            for i in range(diff,len(df_green[0])):
-                area.append(df_coral[0][i])
-                diff_areas.append(abs(df_coral[0][i]-df_green[0][i]))        
+        if len(df_red[0])>len(df_blue[0]):
+            for i in range(diff,len(df_blue[0])):
+                area.append(df_red[0][i])
+                diff_areas.append(abs(df_red[0][i]-df_blue[0][i]))        
             result=1-(sum(diff_areas/sum(area)))
         else:
-            for i in range(diff,len(df_coral[0])):
-                area.append(df_coral[0][i])
-                diff_areas.append(abs(df_coral[0][i]-df_green[0][i]))        
+            for i in range(diff,len(df_red[0])):
+                area.append(df_red[0][i])
+                diff_areas.append(abs(df_red[0][i]-df_blue[0][i]))        
             result=1-(sum(diff_areas)/sum(area))
         
         ranks =[]
-        for i in range(1,len(df_green[0])-1,1):
-            if df_green[0][i]>60:
-                if df_green[0][i]>df_green[0][i-1] and df_green[0][i]>df_green[0][i+1]:
-                    ranks.append(df_green[0][i]/max(df_green[0]))    
+        for i in range(1,len(df_blue[0])-1,1):
+            if df_blue[0][i]>60:
+                if df_blue[0][i]>df_blue[0][i-1] and df_blue[0][i]>df_blue[0][i+1]:
+                    ranks.append(df_blue[0][i]/max(df_blue[0]))    
         ranks1=[]
-        for i in range(1,len(df_coral[0])-1,1):
-            if df_coral[0][i]>60:
-                if df_coral[0][i]>df_coral[0][i-1] and df_coral[0][i]>df_coral[0][i+1]:
-                    ranks1.append(df_coral[0][i]/max(df_coral[0]))
+        for i in range(1,len(df_red[0])-1,1):
+            if df_red[0][i]>60:
+                if df_red[0][i]>df_red[0][i-1] and df_red[0][i]>df_red[0][i+1]:
+                    ranks1.append(df_red[0][i]/max(df_red[0]))
         diffrent=[]
         if len(ranks)>len(ranks1):
             for i in range(len(ranks1)):
@@ -781,17 +816,17 @@ def eval_pitch(ted_audio_path,user_audio_path ,png_save_path):
         pitch_result='Good'
     else:
         pitch_result='Bad'
-    plt.plot(df_green,color='mediumseagreen',linewidth=5)
-    plt.plot(df_coral,color='coral',linewidth=5) 
+    line1, =plt.plot(df_blue,color='navy',linewidth=5)
+    line2, =plt.plot(df_red,color='crimson',linewidth=5) 
     plt.title('Pitch Result',fontsize=50)
-    plt.legend(['Ted','You'],fontsize=20)
+    plt.legend(handles=(line1,line2),labels=('Ted','You'),fontsize=20)  
     plt.ylabel('Pitch',fontsize=20)
     plt.tick_params(axis='x', which='both',bottom=False,top=False,labelbottom=False)
     plt.savefig(png_save_path +'pitch_result.png')
     return pitch_result_rate, pitch_result
 
 
-# In[36]:
+# In[229]:
 
 
 # 구글 stt와 문장 비교.
@@ -811,6 +846,8 @@ def eval_pronounciation(ted_audio_path,user_audio_path):
     mine_token=word_tokenize(mine)
     get_word_error_rate(mine_token,answer_token)
     result=wer(mine_token,answer_token)
+    if result < 0:
+        result= 0
     global pronounciation_result
     if result>80:
         pronounciation_result='Excellent'
@@ -821,10 +858,9 @@ def eval_pronounciation(ted_audio_path,user_audio_path):
     return ted_answer, your_answer,result,pronounciation_result
 
 
-# In[37]:
+# In[230]:
 
 
-# 4개 평가항목 excelleent 3점 good 2점 bad1점 으로 총 평가점수
 def eval_total(speed_result,strength_result,pitch_result,pronounciation_result):
     result_list=[speed_result,strength_result,pitch_result,pronounciation_result]
     score=0
@@ -842,12 +878,9 @@ def eval_total(speed_result,strength_result,pitch_result,pronounciation_result):
     else:                              # 그 외
         total_result='Bad'
     return total_result
-            
-   
-    
 
 
-# In[38]:
+# In[231]:
 
 
 # 전체 함수 하나의 함수로 묶기
@@ -856,7 +889,6 @@ def eval(ted_audio_path,user_audio_path,png_save_path):
     return eval_speed(first_local_maximum_ted, first_local_maximum_you,df,df1),eval_strength(first_local_maximum_ted, first_local_maximum_you,df,df1,png_save_path),eval_pitch(ted_audio_path,user_audio_path,png_save_path),eval_pronounciation(ted_audio_path,user_audio_path),eval_total(speed_result,strength_result,pitch_result,pronounciation_result)
 
 
-
 # In[ ]:
 
 
@@ -864,7 +896,6 @@ def eval(ted_audio_path,user_audio_path,png_save_path):
 
 
 # In[ ]:
-
 
 
 
