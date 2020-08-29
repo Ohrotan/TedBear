@@ -110,7 +110,8 @@ def upload_record():
     file_id = str(session['id']) + '_' + request.form['talks_id'] + '_' + request.form[
         'transcript_index']
     filename = './english/train/voice/' + file_id + '.wav'
-    origin_name = '../zerospeech/english/test/' + request.form['talks_id'] + '_' + request.form['transcript_index'] + '.wav'
+    origin_name = '../zerospeech/english/test/' + request.form['talks_id'] + '_' + request.form[
+        'transcript_index'] + '.wav'
     print("this will be ted path: ", origin_name)
     with open(filename, 'wb') as audio:
         f.save(audio)
@@ -134,22 +135,35 @@ def upload_record():
     # voice_recorder.js 155line에서 결과 이미지 띄우는 코드 만들기
     print(result)
     sp = result['speed']
-    res1 = sp[-1] + " : " + str(sp[0])[:4] + "sec "
+    speed = sp[-1] + " : " + str(sp[0])[:4] + "sec "
     if float(sp[1]) > 100:
-        res1 = res1 + "Slower"
+        speed = speed + "Slower"
     else:
-        res1 = res1 + "Faster"
+        speed = speed + "Faster"
 
     st = result['strength']
-    res2 = st[-1] + " : " + str(st[0])[:2] + " point"
+    strength = st[-1] + " : " + str(st[0])[:2] + " point"
     pi = result['pitch']
-    res3 = pi[-1] + " : " + str(pi[0])[:2] + " point"
+    pitch = pi[-1] + " : " + str(pi[0])[:2] + " point"
     wd = result['words']
-    res4 = wd[3]+" : " + str(wd[2])[:2] + " point<br>" + "<br>" + str(wd[6]) + "<br>" + str(wd[5])
+    ted = ''
+    user = ''
+    #if s = 틀림
+
+    for i in range(len(wd[4])):
+        ted = ted + wd[6][i] + "^^"
+        if wd[4][i] =='s':
+            user = user + "@" +wd[5][i] + "^^"
+        else:
+            user = user + wd[5][i] + "^^"
+
+
+    word_point = wd[3] + " : " + str(wd[2])[:2] + " point"
+    sentence = ted+"%%"+user
+    print(sentence)
     tot = result['tot']
-    res5 = "Total: "+tot[-1] + " : " + str(tot[0])[:2] + " point"
-    res6 = file_id
-    return res1 + "+++" + res2 + "+++" + res3 + "+++" + res4 + "+++" + res5+"+++"+res6
+    tot_point = tot[-1] + " : " + str(tot[0])[:2] + " point"
+    return speed + "+++" + strength + "+++" + pitch + "+++" + word_point + "+++" + sentence + "+++" + tot_point + "+++" + file_id
 
 
 @app.route('/shadowing/<talks_id>')
@@ -185,6 +199,8 @@ def shadowing(talks_id):
     # 사용자 목소리로 컨버트 시키기 비동기처리하기
     # 77_1, 77_10
     # get_converted_audio(str(session['id']), './english/train/voice/', './english/test/', "77_10", "77_10")
+    transcript[transcript_index].sentence_kr = Translator().translate(
+        str(transcript[transcript_index].sentence_en), dest='ko').text
 
     return render_template(
         'shadowing.html',

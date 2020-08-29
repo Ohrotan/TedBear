@@ -40,33 +40,6 @@ r = sr9.Recognizer()
 from nltk.tokenize import word_tokenize
 
 
-# sst 와 비교하여 error 구하는 과정
-def get_word_error_rate(r, h):
-    d = np.zeros((len(r) + 1) * (len(h) + 1), dtype=np.uint16)
-    d = d.reshape((len(r) + 1, len(h) + 1))
-    for i in range(len(r) + 1):
-        for j in range(len(h) + 1):
-            if i == 0:
-                d[0][j] = j
-            elif j == 0:
-                d[i][0] = i
-
-    for i in range(1, len(r) + 1):
-        for j in range(1, len(h) + 1):
-            if r[i - 1] == h[j - 1]:
-                d[i][j] = d[i - 1][j - 1]
-            else:
-                substitution = d[i - 1][j - 1] + 1
-                insertion = d[i][j - 1] + 1
-                deletion = d[i - 1][j] + 1
-                d[i][j] = min(substitution, insertion, deletion)
-    result = float(d[len(r)][len(h)]) / len(r) * 100
-    return 100 - result
-
-
-# In[121]:
-
-
 def editDistance(r, h):
     d = np.zeros((len(r) + 1) * (len(h) + 1), dtype=np.uint8).reshape((len(r) + 1, len(h) + 1))
     for i in range(len(r) + 1):
@@ -230,26 +203,20 @@ def alignedPrint(list9, r, h, result):
     return Ted_words, User_words
 
 
+# (mine_token,ted_token)
 def wer(r, h):
-    """
-    This is a function that calculate the word error rate in ASR.
-    You can use it like this: wer("what is it".split(), "what is".split())
-    """
-    # build the matrix
     d = editDistance(r, h)
-    # find out the manipulation steps
+
     list_final = getStepList(r, h, d)
-    # print the result in aligned way
-    result = float(d[len(r)][len(h)]) / len(r) * 100
+
+    result = float(d[len(r)][len(h)]) / max(len(h), len(r)) * 100
+
     result = round(100 - result, 2)
     result_str = str("%.2f" % result) + "%"
     Ted_words, User_words = alignedPrint(list_final, r, h, result_str)
     # print('D: 놓친단어, S: 잘못말한 단어, I: 원본에 없는 단어')
     return result, Ted_words, User_words
     # return {"result":result, "Ted_words":Ted_words, "User_words":User_words}
-
-
-# In[123]:
 
 
 def preprocess(ted_audio_path, user_audio_path, png_save_path):
@@ -545,7 +512,7 @@ def eval_strength(first_local_maximum_ted, first_local_maximum_you, df, df1, png
     plt.figure(figsize=(20, 5))
     line1, = plt.plot(blue_graph, color='lightblue', linewidth=5)
     line2, = plt.plot(red_graph, color='crimson', linewidth=5)
-    plt.title('Strength Result', fontsize=50)
+    #plt.title('Strength Result', fontsize=50)
     plt.legend(handles=(line1, line2), labels=('Ted', 'You'), fontsize=20)
     plt.ylabel('Strength', fontsize=20)
     plt.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
@@ -805,7 +772,7 @@ def eval_pitch(ted_audio_path, user_audio_path, png_save_path):
         pitch_result = 'Bad'
     line1, = plt.plot(df_blue, color='lightblue', linewidth=5)
     line2, = plt.plot(df_red, color='crimson', linewidth=5)
-    plt.title('Pitch Result', fontsize=50)
+    #plt.title('Pitch Result', fontsize=50)
     plt.legend(handles=(line1, line2), labels=('Ted', 'You'), fontsize=20)
     plt.ylabel('Pitch', fontsize=20)
     plt.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
@@ -836,7 +803,7 @@ def eval_pronounciation(ted_audio_path, user_audio_path):
     mine = mine.lower()
     answer_token = word_tokenize(answer)
     mine_token = word_tokenize(mine)
-    get_word_error_rate(mine_token, answer_token)
+
     result, Ted_words, User_words = wer(mine_token, answer_token)
     global pronounciation_result
     if result > 80:

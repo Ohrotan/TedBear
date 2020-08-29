@@ -119,6 +119,20 @@ function stopRecording() {
 
 function createDownloadLink(blob) {
 
+    preAudio = document.getElementsByTagName('audio')
+    if (preAudio.length > 0) {
+        preAudio.item(0).remove()
+        for (i in recordingsList.children) {
+            recordingsList.children.item(i).remove()
+        }
+        ted = document.getElementById("ted_words")
+        user = document.getElementById("user_words")
+        for (i in ted.children) {
+            ted.children.item(i).remove()
+            user.children.item(i).remove()
+        }
+    }
+
     var url = URL.createObjectURL(blob);
     var au = document.createElement('audio');
     var li = document.createElement('li');
@@ -162,36 +176,71 @@ function createDownloadLink(blob) {
                 result = result.split("+++")
 
                 tot = document.createElement('h3')
-                tot.innerHTML = result[4]
+                tot.innerHTML = result[5]
+                tot.style.color = 'var(--main-blue)'
+                tot.style.textAlign = 'center'
                 li.appendChild(tot)
 
                 speed = document.createElement('h3')
                 speed.innerHTML = result[0]
+                speed.style.marginTop = '3rem'
+                speed.style.textAlign = 'right'
+
                 li.appendChild(speed)
 
                 strength = document.createElement('h3')
-                speed.innerHTML = result[1]
+                strength.innerHTML = result[1]
+                strength.style.textAlign = 'right'
+                strength.style.margin = '3rem 0rem -2rem 0rem'
                 li.appendChild(strength)
 
                 img_tag = document.createElement('img');
                 img_tag.className = 'shadowing_result'
                 //img_tag.src = '/static/graph/strength_result_' + e.target.responseText + '.png'
-                img_tag.src = '/static/graph/strength_result_'+result[5]+'.png'
+                img_tag.src = '/static/graph/strength_result_' + result[6] + '.png'
                 li.appendChild(img_tag)
 
                 pitch = document.createElement('h3')
                 pitch.innerHTML = result[2]
+                pitch.style.textAlign = 'right'
+                pitch.style.margin = '3rem 0rem -2rem 0rem'
                 li.appendChild(pitch)
 
                 img_tag2 = document.createElement('img');
                 img_tag2.className = 'shadowing_result'
                 //img_tag2.src = '/static/graph/pitch_result_' + e.target.responseText + '.png'
-                img_tag2.src = '/static/graph/pitch_result_'+result[5]+'.png'
+                img_tag2.src = '/static/graph/pitch_result_' + result[6] + '.png'
                 li.appendChild(img_tag2)
 
-                words = document.createElement('h3')
-                words.innerHTML = result[3]
-                li.appendChild(words)
+                word_point = document.getElementById('word_point')
+                word_point.innerHTML = result[3]
+                word_point.style.textAlign = 'right'
+
+                li.appendChild(word_point)
+
+                tedtable = document.getElementById("ted_words")
+                usertable = document.getElementById("user_words")
+
+                sentences = result[4].split('%%')
+                ted = sentences[0].split('^^')
+                user = sentences[1].split('^^')
+                for (w in ted) {
+                    word = document.createElement('td')
+                    word.innerHTML = ted[w]
+                    tedtable.appendChild(word)
+                }
+                for (w in user) {
+                    word = document.createElement('td')
+                    console.log(user[w], user[w].startsWith("@"))
+                    if (user[w].startsWith("@")) {
+                        word.style.color = 'red'
+                        word.innerHTML = user[w].substring(1)
+                    } else {
+                        word.innerHTML = user[w]
+                    }
+                    usertable.appendChild(word)
+                }
+
 
             }
         };
@@ -209,8 +258,5 @@ function createDownloadLink(blob) {
 
     //add the li element to the ol
 
-    if (recordingsList.children.length > 0) {
-        recordingsList.children.item(0).remove()
-    }
     recordingsList.appendChild(li);
 }
