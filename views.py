@@ -110,7 +110,7 @@ def upload_record():
     file_id = str(session['id']) + '_' + request.form['talks_id'] + '_' + request.form[
         'transcript_index']
     filename = './english/train/voice/' + file_id + '.wav'
-    origin_name = './english/test/' + request.form['talks_id'] + '_' + request.form['transcript_index'] + '.wav'
+    origin_name = '../zerospeech/english/test/' + request.form['talks_id'] + '_' + request.form['transcript_index'] + '.wav'
     print("this will be ted path: ", origin_name)
     with open(filename, 'wb') as audio:
         f.save(audio)
@@ -122,7 +122,7 @@ def upload_record():
     # 평가한 이미지파일, 컨버트 결과 파일 DB에 넣기
     result = ""
     try:
-        result = evaluate.eval(origin_name, filename, file_id)
+        result = evaluate.eval(os.path.abspath(origin_name), os.path.abspath(filename), file_id)
 
     except:
         print("Eval error")
@@ -132,7 +132,7 @@ def upload_record():
     db_session.add(s_record)
 
     # voice_recorder.js 155line에서 결과 이미지 띄우는 코드 만들기
-    # print(result)
+    print(result)
     sp = result['speed']
     res1 = sp[-1] + " : " + str(sp[0])[:4] + "sec "
     if float(sp[1]) > 100:

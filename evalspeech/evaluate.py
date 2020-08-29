@@ -542,7 +542,7 @@ def eval_strength(first_local_maximum_ted, first_local_maximum_you, df, df1, png
         strength_result = 'Good'
     else:
         strength_result = 'Bad'
-    plt.figure(figsize=(20, 5));
+    plt.figure(figsize=(20, 5))
     line1, = plt.plot(blue_graph, color='lightblue', linewidth=5)
     line2, = plt.plot(red_graph, color='crimson', linewidth=5)
     plt.title('Strength Result', fontsize=50)
@@ -822,10 +822,11 @@ def eval_pronounciation(ted_audio_path, user_audio_path):
     audio = None
     ted_answer = None
     your_answer = None
-    print("825 line: ted_audio_path: ", ted_audio_path)
+
     with sr9.AudioFile(ted_audio_path) as source:
         audio = r.record(source)
         ted_answer = r.recognize_google(audio)
+
     answer = r.recognize_google(audio)
     answer = answer.lower()
     with sr9.AudioFile(user_audio_path) as source:
@@ -880,6 +881,7 @@ def eval(ted_audio_path, user_audio_path, png_save_path):
     strength = list(eval_strength(first_local_maximum_ted, first_local_maximum_you, df, df1, png_save_path))
     pitch = list(eval_pitch(ted_audio_path, user_audio_path, png_save_path))
     words = list(eval_pronounciation(ted_audio_path, user_audio_path))
+
     speed_score = speed[1]
     if speed[1] > 100:
         speed_score = 200 - speed[1]
