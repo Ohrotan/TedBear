@@ -246,6 +246,7 @@ def wer(r, h):
     Ted_words, User_words = alignedPrint(list_final, r, h, result_str)
     # print('D: 놓친단어, S: 잘못말한 단어, I: 원본에 없는 단어')
     return result, Ted_words, User_words
+    # return {"result":result, "Ted_words":Ted_words, "User_words":User_words}
 
 
 # In[123]:
@@ -542,13 +543,13 @@ def eval_strength(first_local_maximum_ted, first_local_maximum_you, df, df1, png
     else:
         strength_result = 'Bad'
     plt.figure(figsize=(20, 5));
-    line1, = plt.plot(blue_graph, color='navy', linewidth=5)
+    line1, = plt.plot(blue_graph, color='lightblue', linewidth=5)
     line2, = plt.plot(red_graph, color='crimson', linewidth=5)
     plt.title('Strength Result', fontsize=50)
     plt.legend(handles=(line1, line2), labels=('Ted', 'You'), fontsize=20)
     plt.ylabel('Strength', fontsize=20)
     plt.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
-    plt.savefig(png_save_path + 'strength_result.png')
+    plt.savefig("../static/graph/" + 'strength_result_' + png_save_path + '.png')
     return strength_result_rate, strength_result
 
 
@@ -562,6 +563,7 @@ def eval_pitch(ted_audio_path, user_audio_path, png_save_path):
     x = x.astype(np.float64)
     frame_length = 1024
     hop_length = 80
+
     f_you = pysptk.swipe(x.astype(np.float64), fs=sr, hopsize=hop_length, min=60, max=240, otype="f0")
     sr1, x1 = wavfile.read(user_audio_path)
     assert sr1 == 16000
@@ -571,7 +573,7 @@ def eval_pitch(ted_audio_path, user_audio_path, png_save_path):
 
     # F0 estimation  # 각 주파수에서 기본 주파수 뽑기 ,def strength 와 같은 과정.
 
-    f_ted = pysptk.swipe(x1.astype(np.float64), fs=sr1, hopsize=hop_length, min=60, max=240, otype="f0")
+    f_ted = pysptk.sptk.swipe(x1.astype(np.float64), fs=sr1, hopsize=hop_length, min=60, max=240, otype="f0")
     plt.figure(figsize=(20, 5))
     ##############
     width = int(len(f_ted) / 22)  # width 조정 해주기
@@ -801,13 +803,13 @@ def eval_pitch(ted_audio_path, user_audio_path, png_save_path):
         pitch_result = 'Good'
     else:
         pitch_result = 'Bad'
-    line1, = plt.plot(df_blue, color='navy', linewidth=5)
+    line1, = plt.plot(df_blue, color='lightblue', linewidth=5)
     line2, = plt.plot(df_red, color='crimson', linewidth=5)
     plt.title('Pitch Result', fontsize=50)
     plt.legend(handles=(line1, line2), labels=('Ted', 'You'), fontsize=20)
     plt.ylabel('Pitch', fontsize=20)
     plt.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
-    plt.savefig(png_save_path + 'pitch_result.png')
+    plt.savefig("../static/graph/" + 'pitch_result_' + png_save_path + '.png')
     return pitch_result_rate, pitch_result
 
 
@@ -817,6 +819,10 @@ def eval_pitch(ted_audio_path, user_audio_path, png_save_path):
 # 구글 stt와 문장 비교.
 def eval_pronounciation(ted_audio_path, user_audio_path):
     r = sr9.Recognizer()
+    audio = None
+    ted_answer = None
+    your_answer = None
+    print("825 line: ted_audio_path: ", ted_audio_path)
     with sr9.AudioFile(ted_audio_path) as source:
         audio = r.record(source)
         ted_answer = r.recognize_google(audio)
@@ -870,17 +876,26 @@ def eval_total(speed_result, strength_result, pitch_result, pronounciation_resul
 def eval(ted_audio_path, user_audio_path, png_save_path):
     first_local_maximum_you, first_local_maximum_ted, df, df1 = preprocess(ted_audio_path, user_audio_path,
                                                                            png_save_path)
-    return eval_speed(first_local_maximum_ted, first_local_maximum_you, df, df1), eval_strength(first_local_maximum_ted,
-                                                                                                first_local_maximum_you,
-                                                                                                df, df1,
-                                                                                                png_save_path), eval_pitch(
-        ted_audio_path, user_audio_path, png_save_path), eval_pronounciation(ted_audio_path,
-                                                                             user_audio_path), eval_total(speed_result,
-                                                                                                          strength_result,
-                                                                                                          pitch_result,
-                                                                                                          pronounciation_result)
-    print('잘된다')
+    speed = list(eval_speed(first_local_maximum_ted, first_local_maximum_you, df, df1))
+    strength = list(eval_strength(first_local_maximum_ted, first_local_maximum_you, df, df1, png_save_path))
+    pitch = list(eval_pitch(ted_audio_path, user_audio_path, png_save_path))
+    words = list(eval_pronounciation(ted_audio_path, user_audio_path))
+    speed_score = speed[1]
+    if speed[1] > 100:
+        speed_score = 200 - speed[1]
+    score = (speed_score + strength[0] + pitch[0] + words[2]) / 4
+    tot = [score, eval_total(speed_result, strength_result, pitch_result, pronounciation_result)]
 
+    result = {"speed": speed, "strength": strength, "pitch": pitch, "words": words, "tot": tot}
+
+    return result
+    # return {"speed":speed,"strength":strength,pitch, pronun,tot}
+
+# (
+# (0.0053125, 100.2, 'Excellent'),
+# (92.5, 'Excellent'),
+# (78, 'Good'),
+# ('start out by saying Houston we have a problem', "if you'd like to learn how to play The Lobster Wii", 0.0, 'Bad', ['d', 'd', 'd', 's', 's', 's', 's', 's', 's', 's', 's', 's'], ['if', 'you', "'d", 'like ', 'to ', 'learn', 'how   ', 'to     ', 'play', 'the ', 'lobster', 'wii    '], ['  ', '   ', '  ', 'start', 'out', 'by   ', 'saying', 'houston', 'we  ', 'have', 'a      ', 'problem']), 'Good')
 
 # In[129]:
 
@@ -891,10 +906,6 @@ def eval(ted_audio_path, user_audio_path, png_save_path):
 # In[131]:
 
 
-#eval(ted_audio_path, user_audio_path, png_save_path)
+# eval(ted_audio_path, user_audio_path, png_save_path)
 
 # In[ ]:
-
-
-
-

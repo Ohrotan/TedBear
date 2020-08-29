@@ -1,6 +1,7 @@
 """
 Routes and views for the flask application.
 """
+import json
 import os
 from flask import render_template
 from init import app, db_session
@@ -15,8 +16,6 @@ from zerospeech import convert
 from zerospeech import editconfig
 from evalspeech import evaluate
 from googletrans import Translator
-
-#evaluate.eval('./zerospeech/english/test/77_10.wav','./zerospeech/english/train/voice/kang1_0124.wav','./evalspeech/graph/')
 
 
 def get_converted_audio(user_id, user_audio_path, org_audio_path, start_transcript, end_transcript):  # 아래 함수들을 한번에 실행
@@ -108,9 +107,11 @@ def history():
 @app.route('/upload', methods=['POST'])
 def upload_record():
     f = request.files['audio_data']
-    filename = './english/train/voice/' + str(session['id']) + '_' + request.form['talks_id'] + '_' + request.form[
-        'transcript_index'] + '.wav'
+    file_id = str(session['id']) + '_' + request.form['talks_id'] + '_' + request.form[
+        'transcript_index']
+    filename = './english/train/voice/' + file_id + '.wav'
     origin_name = './english/test/' + request.form['talks_id'] + '_' + request.form['transcript_index'] + '.wav'
+    print("this will be ted path: ", origin_name)
     with open(filename, 'wb') as audio:
         f.save(audio)
     if os.path.isfile(filename):
@@ -119,16 +120,36 @@ def upload_record():
     print('file uploaded successfully')
 
     # 평가한 이미지파일, 컨버트 결과 파일 DB에 넣기
-    evaluate.eval(filename, origin_name, '../evalspeech/graph/')
+    result = ""
+    try:
+        result = evaluate.eval(origin_name, filename, file_id)
 
+    except:
+        print("Eval error")
     s_record = ShadowingRecord(user_id=session['id'], talks_id=request.form['talks_id'], \
                                sentence_id=request.form['sentence_id'], user_audio=os.path.abspath(filename)
                                )
     db_session.add(s_record)
 
     # voice_recorder.js 155line에서 결과 이미지 띄우는 코드 만들기
+    # print(result)
+    sp = result['speed']
+    res1 = sp[-1] + " : " + str(sp[0])[:4] + "sec "
+    if float(sp[1]) > 100:
+        res1 = res1 + "Slower"
+    else:
+        res1 = res1 + "Faster"
 
-    return '/static/images/search.png'
+    st = result['strength']
+    res2 = st[-1] + " : " + str(st[0])[:2] + " point"
+    pi = result['pitch']
+    res3 = pi[-1] + " : " + str(pi[0])[:2] + " point"
+    wd = result['words']
+    res4 = wd[3]+" : " + str(wd[2])[:2] + " point<br>" + "<br>" + str(wd[6]) + "<br>" + str(wd[5])
+    tot = result['tot']
+    res5 = "Total: "+tot[-1] + " : " + str(tot[0])[:2] + " point"
+    res6 = file_id
+    return res1 + "+++" + res2 + "+++" + res3 + "+++" + res4 + "+++" + res5+"+++"+res6
 
 
 @app.route('/shadowing/<talks_id>')
@@ -161,10 +182,9 @@ def shadowing(talks_id):
     if talks_info.youtube_gap is None:
         talks_info.youtube_gap = 0
 
-
     # 사용자 목소리로 컨버트 시키기 비동기처리하기
     # 77_1, 77_10
-    #get_converted_audio(str(session['id']), './english/train/voice/', './english/test/', "77_10", "77_10")
+    # get_converted_audio(str(session['id']), './english/train/voice/', './english/test/', "77_10", "77_10")
 
     return render_template(
         'shadowing.html',

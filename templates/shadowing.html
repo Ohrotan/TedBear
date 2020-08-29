@@ -25,7 +25,16 @@
                     <label class="custom-control-label" for="customSwitch1">내 목소리로 듣기</label>
                 </div>-->
                 <button class="btn-solid-reg big-btn" id="convert-btn" onclick="convert()">내 목소리로 듣기</button>
-
+                <div>
+                    <span id="prev-btn" onclick="moveSentence(false)">
+                        <img class="btn-img" src="/static/images/left.png">
+                           이전 문장
+                    </span>
+                    <span id="next-btn" onclick="moveSentence(true)">
+                        다음 문장
+                        <img class="btn-img" src="/static/images/right.png">
+                    </span>
+                </div>
             </div> <!-- end of col,Video -->
 
             <!-- Transcript -->
@@ -39,20 +48,17 @@
                 <p class="transcript-kr" id="sentence_kr">
                     {{ transcript[transcript_index].sentence_kr }}
                 </p>
-                <div class="row" style="margin-top: 2rem;">
-                    <span class="col-sm-4" id="replay-btn" onclick="replay()">
-                        <img class="video-btn" src="/static/images/replay.png">
-                    </span>
-                    <span class="col-sm-4 hide" id="stop-btn" onclick="pause()">
+                <div id="user-control" class="row" style="margin-top: 2rem;">
+                    <span class="col-sm-2 hide" id="stop-btn" onclick="pause()">
                         <img class="video-btn" src="/static/images/stop.png">
                     </span>
-                    <span class="col-sm-4" id="play-btn" onclick="play()">
+                    <span class="col-sm-2" id="play-btn" onclick="play()">
                         <img class="video-btn" src="/static/images/play.png">
                     </span>
-                    <span class="col-sm-4" id="rec-btn">
+                    <span class="col-sm-2" id="rec-btn">
                         <img class="video-btn" src="/static/images/mic.png">
                     </span>
-                    <span class="col-sm-4 hide" id="speak-btn">
+                    <span class="col-sm-2 hide" id="speak-btn">
                         <img class="video-btn" src="/static/images/speak.png">
                     </span>
                 </div>
@@ -61,18 +67,9 @@
                 </div>
                 <div id="formats">&nbsp;</div>
 
-                <ol id="recordingsList"></ol>
+                <ol id="recordingsList" style="list-style: none;"></ol>
 
-                <div>
-                    <span id="prev-btn" onclick="moveSentence(false)">
-                        <img class="btn-img" src="/static/images/left.png">
-                           이전 문장
-                    </span>
-                    <span id="next-btn" onclick="moveSentence(true)">
-                        다음 문장
-                        <img class="btn-img" src="/static/images/right.png">
-                    </span>
-                </div>
+
             </div><!-- end of col,Transcript -->
         </div> <!-- end of row -->
     </div> <!-- end of container -->

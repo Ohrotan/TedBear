@@ -50,7 +50,7 @@ function startRecording() {
             sampleRate might change after getUserMedia is called, like it does on macOS when recording through AirPods
             the sampleRate defaults to the one set in your OS for your playback device
         */
-            audioContext = new AudioContext({ sampleRate: 16000 });
+        audioContext = new AudioContext({sampleRate: 16000});
         //update the format
         //document.getElementById("formats").innerHTML = "Format: 1 channel pcm @ " + audioContext.sampleRate / 1000 + "kHz"
 
@@ -137,7 +137,8 @@ function createDownloadLink(blob) {
     //link.innerHTML = "Save to disk";
 
     //add the new audio element to li
-    li.appendChild(au);
+    usercontrol = document.getElementById("user-control")
+    usercontrol.appendChild(au);
 
     //add the filename to the li
     //li.appendChild(document.createTextNode(filename + ".wav "))
@@ -153,17 +154,52 @@ function createDownloadLink(blob) {
         var xhr = new XMLHttpRequest();
         xhr.onload = function (e) {
             if (this.readyState === 4) {
-                console.log("Server returned: ", e.target.responseText);
+                //console.log( e.target.responseText);
+                //console.log(e.target.responseText)
+
+                console.log(e.target.responseText)
+                result = e.target.responseText
+                result = result.split("+++")
+
+                tot = document.createElement('h3')
+                tot.innerHTML = result[4]
+                li.appendChild(tot)
+
+                speed = document.createElement('h3')
+                speed.innerHTML = result[0]
+                li.appendChild(speed)
+
+                strength = document.createElement('h3')
+                speed.innerHTML = result[1]
+                li.appendChild(strength)
+
                 img_tag = document.createElement('img');
-                img_tag.src = e.target.responseText
+                img_tag.className = 'shadowing_result'
+                //img_tag.src = '/static/graph/strength_result_' + e.target.responseText + '.png'
+                img_tag.src = '/static/graph/strength_result_'+result[5]+'.png'
                 li.appendChild(img_tag)
+
+                pitch = document.createElement('h3')
+                pitch.innerHTML = result[2]
+                li.appendChild(pitch)
+
+                img_tag2 = document.createElement('img');
+                img_tag2.className = 'shadowing_result'
+                //img_tag2.src = '/static/graph/pitch_result_' + e.target.responseText + '.png'
+                img_tag2.src = '/static/graph/pitch_result_'+result[5]+'.png'
+                li.appendChild(img_tag2)
+
+                words = document.createElement('h3')
+                words.innerHTML = result[3]
+                li.appendChild(words)
+
             }
         };
         var fd = new FormData();
         fd.append("audio_data", blob, filename);
-        fd.append("talks_id",document.getElementById("talks_id").value);
-        fd.append("sentence_id",document.getElementById("sentence_id").value);
-        fd.append("transcript_index",document.getElementById("transcript_index").value);
+        fd.append("talks_id", document.getElementById("talks_id").value);
+        fd.append("sentence_id", document.getElementById("sentence_id").value);
+        fd.append("transcript_index", document.getElementById("transcript_index").value);
         xhr.open("POST", "/upload", true);
         xhr.send(fd);
     })
@@ -172,5 +208,9 @@ function createDownloadLink(blob) {
     upload.click()
 
     //add the li element to the ol
+
+    if (recordingsList.children.length > 0) {
+        recordingsList.children.item(0).remove()
+    }
     recordingsList.appendChild(li);
 }
