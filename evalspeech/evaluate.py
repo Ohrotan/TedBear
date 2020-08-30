@@ -97,7 +97,7 @@ def alignedPrint(list9, r, h, result):
                 if list9[j] == "d":
                     count += 1
             index = i - count
-            # print(" "*(len(h[index])), end=" ")
+
             Ted_words.append(" " * (len(h[index])))
         elif list9[i] == "s":
             count1 = 0
@@ -112,10 +112,8 @@ def alignedPrint(list9, r, h, result):
             index2 = i - count2
             if len(r[index1]) < len(h[index2]):
                 Ted_words.append(r[index1] + " " * (len(h[index2]) - len(r[index1])))
-                # print(r[index1] + " " * (len(h[index2])-len(r[index1])), end=" ")
             else:
                 Ted_words.append(r[index1])
-                # print(r[index1], end=" "),
         else:
             count = 0
             for j in range(i):
@@ -123,8 +121,7 @@ def alignedPrint(list9, r, h, result):
                     count += 1
             index = i - count
             Ted_words.append(r[index])
-            print(r[index], end=" "),
-    # print("\nShadowed words:", end=" ")
+
     for i in range(len(list9)):
         if list9[i] == "d":
             count = 0
@@ -133,7 +130,7 @@ def alignedPrint(list9, r, h, result):
                     count += 1
             index = i - count
             User_words.append(" " * (len(r[index])))
-            # print(" " * (len(r[index])), end=" ")
+
         elif list9[i] == "s":
             count1 = 0
             for j in range(i):
@@ -147,10 +144,8 @@ def alignedPrint(list9, r, h, result):
             index2 = i - count2
             if len(r[index1]) > len(h[index2]):
                 User_words.append(h[index2] + " " * (len(r[index1]) - len(h[index2])))
-                # print(h[index2] + " " * (len(r[index1])-len(h[index2])), end=" ")
             else:
                 User_words.append(h[index2])
-                # print(h[index2], end=" ")
         else:
             count = 0
             for j in range(i):
@@ -158,8 +153,6 @@ def alignedPrint(list9, r, h, result):
                     count += 1
             index = i - count
             User_words.append(h[index])
-            # print(h[index], end=" ")
-    # print("\ntypes of wrong:", end=" ")
     for i in range(len(list9)):
         if list9[i] == "d":
             count = 0
@@ -167,7 +160,6 @@ def alignedPrint(list9, r, h, result):
                 if list9[j] == "i":
                     count += 1
             index = i - count
-            # print("D" + " " * (len(r[index])-1), end=" ")
         elif list9[i] == "i":
             count = 0
             for j in range(i):
@@ -186,20 +178,13 @@ def alignedPrint(list9, r, h, result):
                 if list9[j] == "d":
                     count2 += 1
             index2 = i - count2
-            if len(r[index1]) > len(h[index2]):
-                print("S" + " " * (len(r[index1]) - 1), end=" ")
-            else:
-                print("S" + " " * (len(h[index2]) - 1), end=" ")
         else:
             count = 0
             for j in range(i):
                 if list9[j] == "i":
                     count += 1
             index = i - count
-            print(" " * (len(r[index])), end=" ")
-    # print("\nCorrect Rate: " + result)
-    # print('!!',Ted_words,'!!')
-    # print('!!!!',User_words,'!!!!')
+
     return Ted_words, User_words
 
 
@@ -302,18 +287,17 @@ def eval_speed(first_local_maximum_ted, first_local_maximum_you, df, df1):
         red_you = list(df1[0])  # red가 나
         add = [0 for z in range(diff)]
         blue_ted_added = add + blue_ted
-        df_ted_added = pd.DataFrame(blue_ted_added)
         # 점수 짧은걸써야함 first1부터 df1[0]       #############  점수구하는 과정###########
-        if len(df_ted_added[0]) > len(df1[0]):
-            index_diff = abs((len(df_ted_added[0]) - (len(df1[0]))))
+        if len(df_ted_added) > len(df1[0]):
+            index_diff = abs((len(df_ted_added) - (len(df1[0]))))
             time_diff = index_diff / 16000
-            time_diff_per = index_diff / (len(df_ted_added[0]) - first_local_maximum_you)
+            time_diff_per = index_diff / (len(df_ted_added) - first_local_maximum_you)
             time_result = round((1 - time_diff_per) * 100, 1)
 
         else:
-            index_diff = abs((len(df1[0])) - (len(df_ted_added[0])))
+            index_diff = abs((len(df1[0])) - (len(df_ted_added)))
             time_diff = index_diff / 16000
-            time_diff_per = index_diff / (len(df_ted_added[0]) - first_local_maximum_you)
+            time_diff_per = index_diff / (len(df_ted_added) - first_local_maximum_you)
             time_result = round((1 + time_diff_per) * 100, 1)
 
     # 테듣가 더길떄               ######## 방금 위에한거의 반대과정 A보다 B가 늦게시작할경우######
@@ -323,15 +307,15 @@ def eval_speed(first_local_maximum_ted, first_local_maximum_you, df, df1):
         red_you = list(df1[0])
         add = [0 for z in range(diff)]
         red_you_added = add + red_you  # 내가짧은이까 더해줘서 red1이생김
-        df_you_added = pd.DataFrame(red_you_added)
+
         # 테드가 첨부분은 더 나중에나옴  ,time_diff= 테드와 user의 시간 차이
-        if len(df_you_added[0]) > len(df[0]):
-            index_diff = abs((len(df_you_added[0]) - (len(df[0]))))
+        if len(df_you_added) > len(df[0]):
+            index_diff = abs((len(df_you_added) - (len(df[0]))))
             time_diff = index_diff / 16000
             time_diff_per = index_diff / (len(df[0]) - first_local_maximum_ted)
             time_result = round((1 + time_diff_per) * 100, 1)
         else:
-            index_diff = abs((len(df[0])) - (len(df_you_added[0])))
+            index_diff = abs((len(df[0])) - (len(df_you_added)))
             time_diff = index_diff / 16000
             time_diff_per = index_diff / (len(df[0]) - first_local_maximum_ted)
             time_result = round((1 - time_diff_per) * 100, 1)
@@ -360,19 +344,19 @@ def eval_strength(first_local_maximum_ted, first_local_maximum_you, df, df1, png
         red_you = list(df1[0])  # red가 나
         add = [0 for z in range(diff)]
         blue_ted_added = add + blue_ted  # 시작부분 맞춰주기위해 [0,0,0,0,] 벡터 더해줌
-        df_ted_added = pd.DataFrame(blue_ted_added)
-        plt.figure(figsize=(20, 5))
+
+
         #       #############  점수구하는 과정###########
-        if len(df_ted_added[0]) > len(df1[0]):
+        if len(df_ted_added) > len(df1[0]):
             area = []
             for z in range(first_local_maximum_you, len(df1[0]), 1):
-                area.append(df_ted_added[0][z])
+                area.append(df_ted_added[z])
             # points = 두 파형의 넓이 비교를 통한 점수계산
-            points = 1 - (sum(abs(df1[0][first_local_maximum_you:len(df1[0])] - df_ted_added[0][
+            points = 1 - (sum(abs(df1[0][first_local_maximum_you:len(df1[0])] - df_ted_added[
                                                                                 first_local_maximum_you:len(
                                                                                     df1[0])])) / sum(area))
             # points = 코사인 유사도
-            points3 = cos_sim(df_ted_added[0][first_local_maximum_you:len(df1[0])],
+            points3 = cos_sim(df_ted_added[first_local_maximum_you:len(df1[0])],
                               df1[0][first_local_maximum_you:len(df1[0])])
 
             # 각 파형에서의 max값 대비 극점 값의 비율을 통해 계산 a,b,c ....
@@ -382,10 +366,10 @@ def eval_strength(first_local_maximum_ted, first_local_maximum_you, df, df1, png
                     if df1[0][i] > df1[0][i - 1] and df1[0][i] > df1[0][i + 1]:
                         ranks.append(df1[0][i] / max(df1[0]))
             ranks1 = []
-            for i in range(1, len(df_ted_added[0]) - 1, 1):
-                if df_ted_added[0][i] > 0.15:
-                    if df_ted_added[0][i] > df_ted_added[0][i - 1] and df_ted_added[0][i] > df_ted_added[0][i + 1]:
-                        ranks1.append(df_ted_added[0][i] / max(df_ted_added[0]))
+            for i in range(1, len(df_ted_added) - 1, 1):
+                if df_ted_added[i] > 0.15:
+                    if df_ted_added[i] > df_ted_added[i - 1] and df_ted_added[i] > df_ted_added[0][i + 1]:
+                        ranks1.append(df_ted_added[i] / max(df_ted_added))
             diffrent = []
             if len(ranks) > len(ranks1):
                 for i in range(len(ranks1)):
@@ -396,14 +380,14 @@ def eval_strength(first_local_maximum_ted, first_local_maximum_you, df, df1, png
             points4 = 1 - (sum(diffrent) / sum(ranks1))
         else:
             area = []
-            for z in range(first_local_maximum_you, len(df_ted_added[0]), 1):
-                area.append(df_ted_added[0][z])
-            points = 1 - (sum(abs(df1[0][first_local_maximum_you:len(df_ted_added[0])] - df_ted_added[0][
+            for z in range(first_local_maximum_you, len(df_ted_added), 1):
+                area.append(df_ted_added[z])
+            points = 1 - (sum(abs(df1[0][first_local_maximum_you:len(df_ted_added)] - df_ted_added[
                                                                                          first_local_maximum_you:len(
-                                                                                             df_ted_added[0])])) / sum(
+                                                                                             df_ted_added)])) / sum(
                 area))
-            points3 = cos_sim(df_ted_added[0][first_local_maximum_you:len(df_ted_added[0])],
-                              df1[0][first_local_maximum_you:len(df_ted_added[0])])
+            points3 = cos_sim(df_ted_added[first_local_maximum_you:len(df_ted_added)],
+                              df1[0][first_local_maximum_you:len(df_ted_added)])
 
             ranks = []
             for i in range(1, len(df1[0]) - 1, 1):
@@ -411,10 +395,10 @@ def eval_strength(first_local_maximum_ted, first_local_maximum_you, df, df1, png
                     if df1[0][i] > df1[0][i - 1] and df1[0][i] > df1[0][i + 1]:
                         ranks.append(df1[0][i] / max(df1[0]))
             ranks1 = []
-            for i in range(1, len(df_ted_added[0]) - 1, 1):
-                if df_ted_added[0][i] > 0.15:
-                    if df_ted_added[0][i] > df_ted_added[0][i - 1] and df_ted_added[0][i] > df_ted_added[0][i + 1]:
-                        ranks1.append(df_ted_added[0][i] / max(df_ted_added[0]))
+            for i in range(1, len(df_ted_added) - 1, 1):
+                if df_ted_added[i] > 0.15:
+                    if df_ted_added[i] > df_ted_added[i - 1] and df_ted_added[i] > df_ted_added[0][i + 1]:
+                        ranks1.append(df_ted_added[i] / max(df_ted_added))
             diffrent = []
             if len(ranks) > len(ranks1):
                 for i in range(len(ranks1)):
@@ -426,7 +410,7 @@ def eval_strength(first_local_maximum_ted, first_local_maximum_you, df, df1, png
 
             ##############################
         red_graph = gaussian_filter1d(df1[0], sigma=2)  # 이거도 뾰족부분 깍는과정인데 왜 두번들어가더라#
-        blue_graph = df_ted_added[0]
+        blue_graph = df_ted_added
     # 테드 보다 user목소리가 더 빨리 시작할때 (반대과정)   위랑
     elif first_local_maximum_you <= first_local_maximum_ted:
         diff = first_local_maximum_ted - first_local_maximum_you
@@ -434,16 +418,16 @@ def eval_strength(first_local_maximum_ted, first_local_maximum_you, df, df1, png
         red_you = list(df1[0])
         add = [0 for z in range(diff)]
         red_you_added = add + red_you  # 내가짧은이까 더해줘서 red1이생김
-        df_you_added = pd.DataFrame(red_you_added)
+        #df_you_added = pd.DataFrame(red_you_added)
         # 테드가 첨부분은 ㄴ더 나중에나옴
-        if len(df_you_added[0]) > len(df[0]):
+        if len(red_you_added ) > len(df[0]):
             area = []
             for z in range(first_local_maximum_ted, len(df[0]), 1):
                 area.append(df[0][z])
             points = 1 - (sum(abs(
-                df[0][first_local_maximum_ted:len(df[0])] - df_you_added[0][first_local_maximum_ted:len(df[0])])) / sum(
+                df[0][first_local_maximum_ted:len(df[0])] - red_you_added [first_local_maximum_ted:len(df[0])])) / sum(
                 area))
-            points3 = cos_sim(df_you_added[0][first_local_maximum_ted:len(df[0])],
+            points3 = cos_sim(red_you_added[first_local_maximum_ted:len(df[0])],
                               df[0][first_local_maximum_ted:len(df[0])])
 
             ranks = []
@@ -452,10 +436,10 @@ def eval_strength(first_local_maximum_ted, first_local_maximum_you, df, df1, png
                     if df[0][i] > df[0][i - 1] and df[0][i] > df[0][i + 1]:
                         ranks.append(df[0][i] / max(df[0]))
             ranks1 = []
-            for i in range(1, len(df_you_added[0]) - 1, 1):
-                if df_you_added[0][i] > 0.15:
-                    if df_you_added[0][i] > df_you_added[0][i - 1] and df_you_added[0][i] > df_you_added[0][i + 1]:
-                        ranks1.append(df_you_added[0][i] / max(df_you_added[0]))
+            for i in range(1, len(red_you_added ) - 1, 1):
+                if red_you_added[i] > 0.15:
+                    if red_you_added[i] >red_you_added[i - 1] and red_you_added[i] > red_you_added[i + 1]:
+                        ranks1.append(red_you_added[i] / max(red_you_added))
             diffrent = []
             if len(ranks) > len(ranks1):
                 for i in range(len(ranks1)):
@@ -466,24 +450,24 @@ def eval_strength(first_local_maximum_ted, first_local_maximum_you, df, df1, png
             points4 = 1 - (sum(diffrent) / sum(ranks))
         else:
             area = []
-            for z in range(first_local_maximum_ted, len(df_you_added[0]), 1):
+            for z in range(first_local_maximum_ted, len(red_you_added), 1):
                 area.append(df[0][z])
-            points = 1 - (sum(abs(df[0][first_local_maximum_ted:len(df_you_added[0])] - df_you_added[0][
+            points = 1 - (sum(abs(df[0][first_local_maximum_ted:len(red_you_added)] - red_you_added[
                                                                                         first_local_maximum_ted:len(
-                                                                                            df_you_added[0])])) / sum(
+                                                                                            red_you_added)])) / sum(
                 area))
-            points3 = cos_sim(df_you_added[0][first_local_maximum_ted:len(df_you_added[0])],
-                              df[0][first_local_maximum_ted:len(df_you_added[0])])
+            points3 = cos_sim(red_you_added[first_local_maximum_ted:len(red_you_added)],
+                              df[0][first_local_maximum_ted:len(red_you_added)])
             ranks = []
             for i in range(1, len(df[0]) - 1, 1):
                 if df[0][i] > 0.15:
                     if df[0][i] > df[0][i - 1] and df[0][i] > df[0][i + 1]:
                         ranks.append(df[0][i] / max(df[0]))
             ranks1 = []
-            for i in range(1, len(df_you_added[0]) - 1, 1):
-                if df_you_added[0][i] > 0.15:
-                    if df_you_added[0][i] > df_you_added[0][i - 1] and df_you_added[0][i] > df_you_added[0][i + 1]:
-                        ranks1.append(df_you_added[0][i] / max(df_you_added[0]))
+            for i in range(1, len(red_you_added) - 1, 1):
+                if red_you_added[i] > 0.15:
+                    if red_you_added[i] > red_you_added[i - 1] and red_you_added[i] > red_you_added[i + 1]:
+                        ranks1.append(red_you_added[i] / max(red_you_added))
             diffrent = []
             if len(ranks) > len(ranks1):
                 for i in range(len(ranks1)):
@@ -494,7 +478,7 @@ def eval_strength(first_local_maximum_ted, first_local_maximum_you, df, df1, png
             points4 = 1 - (sum(diffrent) / sum(ranks))
 
         blue_graph = df[0]
-        red_graph = df_you_added[0]
+        red_graph = red_you_added 
     result1 = int(points * 100)
     result4 = int(points3 * 100)
     result5 = int(points4 * 100)
@@ -770,6 +754,7 @@ def eval_pitch(ted_audio_path, user_audio_path, png_save_path):
         pitch_result = 'Good'
     else:
         pitch_result = 'Bad'
+    plt.figure(figsize(20,5))
     line1, = plt.plot(df_blue, color='lightblue', linewidth=5)
     line2, = plt.plot(df_red, color='crimson', linewidth=5)
     #plt.title('Pitch Result', fontsize=50)
