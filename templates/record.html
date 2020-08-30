@@ -19,13 +19,17 @@
             </div>
             <div class="col-lg-6">
                 <div class="row" style="margin-top: -0.4rem;">
-                    <span class="col-sm-12" id="rec-btn">
+                    <span class="col-sm-6" id="rec-btn">
                         <img class="video-btn" src="/static/images/mic.png">
                         <span style="font-size: 2.3rem;vertical-align: middle;font-weight: 700;">RECORD</span>
                     </span>
-                    <span class="col-sm-12 hide" id="speak-btn">
+                    <span class="col-sm-6 hide" id="speak-btn">
                         <img class="video-btn" src="/static/images/speak.png">
                         <span style="font-size: 2.3rem;vertical-align: middle;font-weight: 700;">SAVE</span>
+                    </span>
+                     <span class="col-sm-6" >
+                        <button class="btn-solid-reg big-btn" style="font-size: 2.3rem;vertical-align: middle;font-weight: 700;float: right"
+                        onclick="train()">SAVE ALL</button>
                     </span>
                 </div>
 
@@ -59,32 +63,12 @@
     });
 
 
-    function convert() {
-        $("#convert-btn")[0].innerText = "변환 중..."
-        /**
+    function train() {
+
          var xhr = new XMLHttpRequest();
-         xhr.onload = function (e) {
-            if (this.readyState === 4) {
-                console.log("Server returned: ", e.target.responseText);
-                sentence = e.target.responseText
-                sentence = JSON.parse(sentence)
-
-                document.getElementById("sentence_en").textContent = sentence['sentence_en']
-                document.getElementById("sentence_kr").textContent = sentence['sentence_kr']
-                start_time = sentence['start_time'] + gap
-                duration = sentence['duration']
-                document.getElementById("transcript_index").value = ++transcript_index
-                document.getElementById("sentence_id").value = sentence['id']
-
-                seekToStart()
-            }
-        };
          var fd = new FormData();
-         fd.append("transcript_index", document.getElementById("transcript_index").value);
-         xhr.open("POST", "/convert", true);
+         xhr.open("POST", "/train", true);
          xhr.send(fd);
 
-         }
-         **/
     }
 </script>

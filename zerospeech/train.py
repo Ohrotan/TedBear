@@ -5,23 +5,23 @@ from itertools import chain
 from pathlib import Path
 from tqdm import tqdm
 
-import apex.amp as amp
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
-from dataset import SpeechDataset
-from model import Encoder, Decoder
+from zerospeech.dataset import SpeechDataset
+from zerospeech.model import Encoder, Decoder
+#from zerospeech import dataset.SpeechDataset as SpeechDataset
+#from zerospeech import model.Encoder as Encoder, model.Decoder as Decoder
 
 # training 중간과정을 기록함, 중단되어도 다시 그 지점부터 시작할 수 있도록
-def save_checkpoint(encoder, decoder, optimizer, amp, scheduler, step, checkpoint_dir):
+def save_checkpoint(encoder, decoder, optimizer, scheduler, step, checkpoint_dir):
     checkpoint_state = {
         "encoder": encoder.state_dict(),
         "decoder": decoder.state_dict(),
         "optimizer": optimizer.state_dict(),
-        "amp": amp.state_dict(),
         "scheduler": scheduler.state_dict(),
         "step": step}
     checkpoint_dir.mkdir(exist_ok=True, parents=True)
@@ -32,7 +32,7 @@ def save_checkpoint(encoder, decoder, optimizer, amp, scheduler, step, checkpoin
     print("Saved checkpoint: {}".format(checkpoint_path.stem))
 
 
-@hydra.main(config_path="config/train.yaml")
+@hydra.main(config_path="/zerospeech/config/train.yaml")
 def train_model(cfg): # 위의 confg_path의 파일의 모든 값이 cfg로 함수의 인자로 들어오는 것
     tensorboard_path = Path(utils.to_absolute_path("tensorboard")) / cfg.checkpoint_dir
     checkpoint_dir = Path(utils.to_absolute_path(cfg.checkpoint_dir)) # chekpoint dir 지정
@@ -53,7 +53,6 @@ def train_model(cfg): # 위의 confg_path의 파일의 모든 값이 cfg로 함�
         lr=cfg.training.optimizer.lr)
 
 #amp는 tensor core의 트레이닝을 가속화시켜주는 도구
-    [encoder, decoder], optimizer = amp.initialize([encoder, decoder], optimizer, opt_level="O1")
 # 학습률을 최적화하는 스케줄러
     scheduler = optim.lr_scheduler.MultiStepLR(
         optimizer, milestones=cfg.training.scheduler.milestones,
@@ -68,7 +67,6 @@ def train_model(cfg): # 위의 confg_path의 파일의 모든 값이 cfg로 함�
         encoder.load_state_dict(checkpoint["encoder"])
         decoder.load_state_dict(checkpoint["decoder"])
         optimizer.load_state_dict(checkpoint["optimizer"])
-        amp.load_state_dict(checkpoint["amp"])
         scheduler.load_state_dict(checkpoint["scheduler"])
         global_step = checkpoint["step"]
     else:
@@ -108,10 +106,11 @@ def train_model(cfg): # 위의 confg_path의 파일의 모든 값이 cfg로 함�
             recon_loss = F.cross_entropy(output.transpose(1, 2), audio[:, 1:])
             loss = recon_loss + vq_loss
 
-            with amp.scale_loss(loss, optimizer) as scaled_loss:
-                scaled_loss.backward()
+            loss.backward()
 
-            torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer), 1)
+            torch.nn.utils.clip_grad_norm_(encoder.parameters(), 1)
+            torch.nn.utils.clip_grad_norm_(decoder.parameters(), 1)
+
             optimizer.step()
             scheduler.step()
 
@@ -124,7 +123,7 @@ def train_model(cfg): # 위의 confg_path의 파일의 모든 값이 cfg로 함�
 # cfg.training.checkpoint_interval 에서 지정한 횟수마다 주기적으로 트레이닝 중간 과정 checkpoints에 기록하여서 갑자기 중단되더라도 복구할 수 있게 백업본 만들기
             if global_step % cfg.training.checkpoint_interval == 0:
                 save_checkpoint(
-                    encoder, decoder, optimizer, amp,
+                    encoder, decoder, optimizer,
                     scheduler, global_step, checkpoint_dir)
 # training 결과 기록
         writer.add_scalar("recon_loss/train", average_recon_loss, global_step)

@@ -46,5 +46,41 @@
 		0.0,
 		0.51,
 		"english/train/1/1_77_10"
+	],
+	[
+		"english/train/voice/1_36_0",
+		0.0,
+		3.84,
+		"english/train/1/1_36_0"
+	],
+	[
+		"english/train/voice/1_4_0",
+		0.0,
+		0.25,
+		"english/train/1/1_4_0"
+	],
+	[
+		"english/train/voice/1_77_0",
+		0.0,
+		4.35,
+		"english/train/1/1_77_0"
+	],
+	[
+		"english/train/voice/1_77_10",
+		0.0,
+		2.81,
+		"english/train/1/1_77_10"
+	],
+	[
+		"english/train/voice/1_790e55b4c83e4a0699ecba35990a337f",
+		0.0,
+		1.28,
+		"english/train/1/1_790e55b4c83e4a0699ecba35990a337f"
+	],
+	[
+		"english/train/voice/1_c6f60e8a439e41d88072fe518e623256",
+		0.0,
+		0.51,
+		"english/train/1/1_c6f60e8a439e41d88072fe518e623256"
 	]
 ]

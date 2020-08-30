@@ -1,7 +1,6 @@
 """
 Routes and views for the flask application.
 """
-import json
 import os
 from flask import render_template
 from init import app, db_session
@@ -9,12 +8,14 @@ from models import Talks, WatchingRecord, Sentence, ShadowingRecord
 import ast
 from flask import Flask, jsonify, request, session, redirect
 import hydra
-
+import uuid
 import asyncio
 
 from zerospeech import convert
 from zerospeech import editconfig
 from evalspeech import evaluate
+# from zerospeech import preprocess
+from zerospeech import train
 from googletrans import Translator
 
 
@@ -104,31 +105,32 @@ def history():
     )
 
 
-@app.route('/upload', methods=['POST'])
-def upload_record():
-    f = request.files['audio_data']
+def audio_upload(file, file_name):
+    with open(file_name, 'wb') as audio:
+        file.save(audio)
+    if os.path.isfile(file_name):
+        # os.path.abspath('./audio.wav')
+        print("user audio uploaded at", os.path.abspath(file_name))
+
+
+@app.route('/eval', methods=['POST'])
+def eval(result=None):
     file_id = str(session['id']) + '_' + request.form['talks_id'] + '_' + request.form[
         'transcript_index']
-    filename = './english/train/voice/' + file_id + '.wav'
-    origin_name = '../zerospeech/english/test/' + request.form['talks_id'] + '_' + request.form[
+    origin_audio = '../zerospeech/english/test/' + request.form['talks_id'] + '_' + request.form[
         'transcript_index'] + '.wav'
-    print("this will be ted path: ", origin_name)
-    with open(filename, 'wb') as audio:
-        f.save(audio)
-    if os.path.isfile(filename):
-        # os.path.abspath('./audio.wav')
-        print("user audio file path:", os.path.abspath(filename))
-    print('file uploaded successfully')
-
+    user_audio = './english/train/voice/' + file_id + '.wav'
+    audio_upload(request.files['audio_data'], user_audio)
     # 평가한 이미지파일, 컨버트 결과 파일 DB에 넣기
-    result = ""
+    result = ''
     try:
-        result = evaluate.eval(os.path.abspath(origin_name), os.path.abspath(filename), file_id)
+        result = evaluate.eval(os.path.abspath(origin_audio), os.path.abspath(user_audio), file_id)
 
     except:
         print("Eval error")
+
     s_record = ShadowingRecord(user_id=session['id'], talks_id=request.form['talks_id'], \
-                               sentence_id=request.form['sentence_id'], user_audio=os.path.abspath(filename)
+                               sentence_id=request.form['sentence_id'], user_audio=os.path.abspath(user_audio)
                                )
     db_session.add(s_record)
 
@@ -148,18 +150,17 @@ def upload_record():
     wd = result['words']
     ted = ''
     user = ''
-    #if s = 틀림
+    # if s = 틀림
 
     for i in range(len(wd[4])):
         ted = ted + wd[6][i] + "^^"
-        if wd[4][i] =='s':
-            user = user + "@" +wd[5][i] + "^^"
+        if wd[4][i] == 's':
+            user = user + "@" + wd[5][i] + "^^"
         else:
             user = user + wd[5][i] + "^^"
 
-
     word_point = wd[3] + " : " + str(wd[2])[:2] + " point"
-    sentence = ted+"%%"+user
+    sentence = ted + "%%" + user
     print(sentence)
     tot = result['tot']
     tot_point = tot[-1] + " : " + str(tot[0])[:2] + " point"
@@ -196,12 +197,6 @@ def shadowing(talks_id):
     if talks_info.youtube_gap is None:
         talks_info.youtube_gap = 0
 
-    # 사용자 목소리로 컨버트 시키기 비동기처리하기
-    # 77_1, 77_10
-    # get_converted_audio(str(session['id']), './english/train/voice/', './english/test/', "77_10", "77_10")
-    transcript[transcript_index].sentence_kr = Translator().translate(
-        str(transcript[transcript_index].sentence_en), dest='ko').text
-
     return render_template(
         'shadowing.html',
         talks_info=talks_info,
@@ -235,9 +230,31 @@ def next_sentence():
 @app.route('/record', methods=['GET', 'POST'])
 def record():
     # 사용자 오디오 파일 서버에 저장
+    if request.method == 'POST':
+        user_audio = './english/train/voice/' + str(session['id']) + '_' + uuid.uuid4().hex + '.wav'
+        audio_upload(request.files['audio_data'], user_audio)
+        s_record = ShadowingRecord(user_id=session['id'], talks_id=0, \
+                                   sentence_id=0, user_audio=os.path.abspath(user_audio)
+                                   )
+        db_session.add(s_record)
+        return 'ok'
     transcript = Sentence.query.filter_by(talks_id=77).limit(5).all()
     return render_template('record.html', transcript=transcript)
 
+
+@app.route('/convert', methods=['POST'])
+def req_convert():
+    # 사용자 목소리로 컨버트 시키기 비동기처리하기
+    get_converted_audio(str(session['id']), './english/train/voice/', './english/test/',
+                        request.form['talks_id'] + '_' + request.form['transcript_index'],
+                        request.form['talks_id'] + '_' + request.form['transcript_index'])
+    return "/zerospeech/result/" + str(session['id']) + "_" + request.form['talks_id'] + '_' + \
+           request.form['transcript_index'] + ".wav"
+
+
+@app.route('/train', methods=['POST'])
+def req_train():
+    train.train_model()
 
 @app.route('/logout')
 def logout():

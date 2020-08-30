@@ -119,6 +119,36 @@ function stopRecording() {
 
 function createDownloadLink(blob) {
 
+
+    var url = URL.createObjectURL(blob);
+    var au = document.createElement('audio');
+    var li = document.createElement('li');
+    li.style.listStyle = 'none'
+    var link = document.createElement('a');
+
+
+    var filename = new Date().toISOString();
+
+
+    au.controls = true;
+    au.src = url;
+
+    link.href = url;
+    link.download = filename + ".wav";
+
+    if (window.location.pathname == '/record') {
+        li.appendChild(au)
+
+        var fd = new FormData();
+        fd.append("audio_data", blob, filename);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/record", true);
+        xhr.send(fd);
+
+        recordingsList.appendChild(li)
+        return;
+    }
     preAudio = document.getElementsByTagName('audio')
     if (preAudio.length > 0) {
         preAudio.item(0).remove()
@@ -132,35 +162,18 @@ function createDownloadLink(blob) {
             user.children.item(i).remove()
         }
     }
-
-    var url = URL.createObjectURL(blob);
-    var au = document.createElement('audio');
-    var li = document.createElement('li');
-    var link = document.createElement('a');
-
-    //name of .wav file to use during upload and download (without extendion)
-    var filename = new Date().toISOString();
-
-    //add controls to the <audio> element
-    au.controls = true;
-    au.src = url;
-
-    //save to disk link
-    link.href = url;
-    link.download = filename + ".wav"; //download forces the browser to donwload the file using the  filename
-    //link.innerHTML = "Save to disk";
-
-    //add the new audio element to li
+//add the new audio element to li
     usercontrol = document.getElementById("user-control")
     usercontrol.appendChild(au);
 
-    //add the filename to the li
-    //li.appendChild(document.createTextNode(filename + ".wav "))
 
-    //add the save to disk link to li
-    //li.appendChild(link);
+//add the filename to the li
+//li.appendChild(document.createTextNode(filename + ".wav "))
 
-    //upload link
+//add the save to disk link to li
+//li.appendChild(link);
+
+//upload link
     var upload = document.createElement('a');
     upload.href = "#";
     upload.innerHTML = "Upload";
@@ -221,6 +234,14 @@ function createDownloadLink(blob) {
                 tedtable = document.getElementById("ted_words")
                 usertable = document.getElementById("user_words")
 
+                word = document.createElement('td')
+                word.innerHTML = "TED: "
+                tedtable.appendChild(word)
+
+                word = document.createElement('td')
+                word.innerHTML = "YOU: "
+                usertable.appendChild(word)
+
                 sentences = result[4].split('%%')
                 ted = sentences[0].split('^^')
                 user = sentences[1].split('^^')
@@ -249,14 +270,14 @@ function createDownloadLink(blob) {
         fd.append("talks_id", document.getElementById("talks_id").value);
         fd.append("sentence_id", document.getElementById("sentence_id").value);
         fd.append("transcript_index", document.getElementById("transcript_index").value);
-        xhr.open("POST", "/upload", true);
+        xhr.open("POST", "/eval", true);
         xhr.send(fd);
     })
-    //li.appendChild(document.createTextNode(" "))//add a space in between
-    //li.appendChild(upload)//add the upload link to li
+//li.appendChild(document.createTextNode(" "))//add a space in between
+//li.appendChild(upload)//add the upload link to li
     upload.click()
 
-    //add the li element to the ol
+//add the li element to the ol
 
     recordingsList.appendChild(li);
 }
