@@ -267,13 +267,14 @@ def req_convert():
 
 @app.route('/train', methods=['POST'])
 def req_train():
-
     file_list = [f for f in listdir('./english/train/voice/') if f.startswith(str(session['id']) + "_")]
-
+    user_in_speaker.user_in_speaker(session['id'],'./english/train/voice/'+file_list[0])
     editconfig.train_json('./english/train/voice/', session['id'])
     preprocess.userid(session['id'])
     preprocess.preprocess_dataset()
+    hydra._internal.hydra.GlobalHydra().clear()
     train.train_model()
+    hydra._internal.hydra.GlobalHydra().clear()
 
 
 @app.route('/logout')

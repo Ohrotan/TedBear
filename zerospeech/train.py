@@ -9,7 +9,7 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from torch.utils.tensorboard import SummaryWriter
+#from torch.utils.tensorboard import SummaryWriter
 
 from zerospeech.dataset import SpeechDataset
 from zerospeech.model import Encoder, Decoder
@@ -39,9 +39,9 @@ def save_checkpoint(encoder, decoder, optimizer, scheduler, step, checkpoint_dir
 @hydra.main(config_path="/zerospeech/config/train.yaml")
 def train_model(cfg): # 위의 confg_path의 파일의 모든 값이 cfg로 함수의 인자로 들어오는 것
     cfg.checkpoint_dir = "checkpoints"
-    tensorboard_path = Path(utils.to_absolute_path("tensorboard")) / cfg.checkpoint_dir
+    #tensorboard_path = Path(utils.to_absolute_path("tensorboard")) / cfg.checkpoint_dir
     checkpoint_dir = Path(utils.to_absolute_path(cfg.checkpoint_dir)) # chekpoint dir 지정
-    writer = SummaryWriter(tensorboard_path)
+    #writer = SummaryWriter(tensorboard_path)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # cuda 사용이 가능하지 않으면 cpu 사용
 
 # 객체 생성시 초기값을 config/model/default.yaml 에서 가져옴
@@ -131,9 +131,9 @@ def train_model(cfg): # 위의 confg_path의 파일의 모든 값이 cfg로 함�
                     encoder, decoder, optimizer,
                     scheduler, global_step, checkpoint_dir)
 # training 결과 기록
-        writer.add_scalar("recon_loss/train", average_recon_loss, global_step)
-        writer.add_scalar("vq_loss/train", average_vq_loss, global_step)
-        writer.add_scalar("average_perplexity", average_perplexity, global_step)
+        #writer.add_scalar("recon_loss/train", average_recon_loss, global_step)
+        #writer.add_scalar("vq_loss/train", average_vq_loss, global_step)
+        #writer.add_scalar("average_perplexity", average_perplexity, global_step)
 
         print("epoch:{}, recon loss:{:.2E}, vq loss:{:.2E}, perpexlity:{:.3f}"
               .format(epoch, average_recon_loss, average_vq_loss, average_perplexity))

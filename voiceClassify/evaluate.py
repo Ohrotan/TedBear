@@ -1,19 +1,18 @@
-import os
-import shutil
-from utils import *
+
+from voiceClassify.utils import *
 import numpy as np
 
 from xgboost import XGBClassifier
-import time
+
 import wave
-from ast import literal_eval
-from pickle import load,dump
+
+from pickle import dump
 
 from sklearn.preprocessing import normalize
-from sklearn.linear_model import SGDClassifier
+
 from sklearn.model_selection import GridSearchCV , StratifiedKFold
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_curve, auc,accuracy_score
+from sklearn.metrics import accuracy_score
 
 import warnings
 

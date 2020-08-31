@@ -61,7 +61,7 @@ class Sentence(Base):
     sentence_kr = Column(String(50))
 
     def __init__(self, id=None, talks_id=None, start_time=None, end_time=None, \
-                 duration=None, audio=None, sentence_en=None, sentence_kr=None):
+                 duration=None, audio=None, sentence_en=None):
         self.id = id
         self.talks_id = talks_id
         self.start_time = start_time

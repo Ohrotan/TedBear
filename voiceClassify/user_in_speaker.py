@@ -1,4 +1,4 @@
-from voiceClassify import VoiceClassify
+from voiceClassify.voiceClassify import VoiceClassify
 import json
 
 #input : 'kang1', './test/kang1_178.wav' 형식
@@ -9,7 +9,7 @@ def user_in_speaker(user_id,user_audio_file): # speaker.json파일을 xgboost에
     vc = VoiceClassify(user_audio_file)
     predicted = vc.predict()
     result=predicted[0][0][0]
-    with open("../zerospeech/datasets/english/speakers.json", 'w', encoding='utf-8') as make_file:
+    with open("./datasets/english/speakers.json", 'w', encoding='utf-8') as make_file:
         speakers=["S015", "S020", "S021", "S023",  "S027",  "S031",  "S032",  "S033",  "S034",  "S035",  "S036",  "S037",  "S038",  "S039",
     "S040",  "S041",  "S042",  "S043",  "S044",   "S045", "S046","S047","S048", "S049","S050", "S051", "S052", "S053", "S054",
     "S055", "S056", "S058",  "S059", "S060", "S061", "S063", "S064", "S065", "S066", "S067", "S069",  "S070", "S071",  "S072",
