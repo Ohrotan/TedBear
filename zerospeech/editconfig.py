@@ -117,11 +117,6 @@ def synthesis_json(user_id,org_audio_path,start_transcript,end_transcript): # ì
     end_point=int(end_transcript.split('_')[1])
     for j in range(start_point,end_point+1):
         file_list.append(str(ted_id)+'_'+str(j))
-<<<<<<< HEAD
-    #file_list.append(str(ted_id)+'_'+str(start_point))
-=======
-
->>>>>>> 3106147ef1bdd23b66a0ac46927460bf22041bb8
     filename = 'datasets/english/synthesis_list_'+str(user_id)+'.json'
 
     yml = bios.read('./config/convert.yaml')

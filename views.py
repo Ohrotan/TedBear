@@ -1,4 +1,5 @@
-<<<<<<< HEAD
+from os import listdir
+
 """
 Routes and views for the flask application.
 """
@@ -18,7 +19,7 @@ from evalspeech import evaluate
 from zerospeech import preprocess
 from zerospeech import train
 from googletrans import Translator
-
+from voiceClassify import user_in_speaker
 
 def get_converted_audio(user_id, user_audio_path, org_audio_path, start_transcript, end_transcript):  # 아래 함수들을 한번에 실행
     editconfig.speaker_json(user_audio_path, org_audio_path)
@@ -266,6 +267,9 @@ def req_convert():
 
 @app.route('/train', methods=['POST'])
 def req_train():
+
+    file_list = [f for f in listdir('./english/train/voice/') if f.startswith(str(session['id']) + "_")]
+
     editconfig.train_json('./english/train/voice/', session['id'])
     preprocess.userid(session['id'])
     preprocess.preprocess_dataset()
