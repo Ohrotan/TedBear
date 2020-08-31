@@ -11,4 +11,5 @@ tebear-aws-key-pair.pem
 /static/graph/
 zerospeech/english/test/
 zerospeech/english/train/
+
 *.pt
