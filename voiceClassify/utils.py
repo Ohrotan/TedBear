@@ -1,8 +1,6 @@
 import os
 import librosa
 import numpy as np
-import pandas as pd
-from sklearn.preprocessing import normalize
 
 
 
@@ -11,8 +9,6 @@ def extract_features(file_name,label = None): #mfcc, mel, tonnetz 추출
     X, sample_rate = librosa.load(file_name, res_type='kaiser_fast') 
 
     mfccs = np.mean(librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=40).T,axis=0)
-
-    stft = np.abs(librosa.stft(X))
 
     mel = np.mean(librosa.feature.melspectrogram(X, sr=sample_rate).T,axis=0)
     

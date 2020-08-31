@@ -8,68 +8,8 @@
 	[
 		"english/train/voice/1_36_0",
 		0.0,
-		1.53,
+		3.84,
 		"english/train/1/1_36_0"
-	],
-	[
-		"english/train/voice/1_36_1",
-		0.0,
-		2.81,
-		"english/train/1/1_36_1"
-	],
-	[
-		"english/train/voice/1_36_2",
-		0.0,
-		2.81,
-		"english/train/1/1_36_2"
-	],
-	[
-		"english/train/voice/1_36_3",
-		0.0,
-		2.3,
-		"english/train/1/1_36_3"
-	],
-	[
-		"english/train/voice/1_36_4",
-		0.0,
-		1.28,
-		"english/train/1/1_36_4"
-	],
-	[
-		"english/train/voice/1_47_0",
-		0.0,
-		0.0,
-		"english/train/1/1_47_0"
-	],
-	[
-		"english/train/voice/1_47_1",
-		0.0,
-		1.79,
-		"english/train/1/1_47_1"
-	],
-	[
-		"english/train/voice/1_47_10",
-		0.0,
-		1.79,
-		"english/train/1/1_47_10"
-	],
-	[
-		"english/train/voice/1_47_11",
-		0.0,
-		2.04,
-		"english/train/1/1_47_11"
-	],
-	[
-		"english/train/voice/1_47_13",
-		0.0,
-		1.53,
-		"english/train/1/1_47_13"
-	],
-	[
-		"english/train/voice/1_47_15",
-		0.0,
-		2.56,
-		"english/train/1/1_47_15"
 	],
 	[
 		"english/train/voice/1_4_0",
@@ -78,57 +18,15 @@
 		"english/train/1/1_4_0"
 	],
 	[
-		"english/train/voice/1_4_4486",
-		0.0,
-		0.25,
-		"english/train/1/1_4_4486"
-	],
-	[
 		"english/train/voice/1_77_0",
 		0.0,
-		1.53,
+		4.35,
 		"english/train/1/1_77_0"
-	],
-	[
-		"english/train/voice/1_77_1",
-		0.0,
-		2.3,
-		"english/train/1/1_77_1"
 	],
 	[
 		"english/train/voice/1_77_10",
 		0.0,
 		2.81,
 		"english/train/1/1_77_10"
-	],
-	[
-		"english/train/voice/1_790e55b4c83e4a0699ecba35990a337f",
-		0.0,
-		1.28,
-		"english/train/1/1_790e55b4c83e4a0699ecba35990a337f"
-	],
-	[
-		"english/train/voice/1_7945f4a110b44d72933b41ee50cdcc78",
-		0.0,
-		0.25,
-		"english/train/1/1_7945f4a110b44d72933b41ee50cdcc78"
-	],
-	[
-		"english/train/voice/1_c23e0e1cf3e8422d8116bfbb732c857c",
-		0.0,
-		0.76,
-		"english/train/1/1_c23e0e1cf3e8422d8116bfbb732c857c"
-	],
-	[
-		"english/train/voice/1_c6f60e8a439e41d88072fe518e623256",
-		0.0,
-		0.51,
-		"english/train/1/1_c6f60e8a439e41d88072fe518e623256"
-	],
-	[
-		"english/train/voice/kang1_0124",
-		0.0,
-		2.46,
-		"english/train/kang1/kang1_0124"
 	]
 ]

@@ -2,7 +2,7 @@ import os
 from os import walk
 import shutil
 import numpy as np
-from utils import *
+from voiceClassify.utils import *
 from pickle import load,dump
 from sklearn.preprocessing import normalize
 
@@ -11,7 +11,7 @@ class VoiceClassify():
 
     def __init__(self,user_audio_file):
         
-        with open("./model/clf-xgboost.pkl","rb") as f: # xgboost 모델 불러오기
+        with open("../voiceClassify/model/clf-xgboost.pkl","rb") as f: # xgboost 모델 불러오기
             self.clf=load(f)
         self.user_audio_file=user_audio_file
         
