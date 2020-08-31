@@ -108,17 +108,18 @@ def test_json(org_audio_path):  # ted오디오의 정보를 기록하는 test.js
     print('test success')
 
 
-def synthesis_json(user_id, org_audio_path, start_transcript, end_transcript):  # 음성 합성할 때 쓸 synthesis_list.json 변경
-    user_name = str(user_id)  # user_id로 speaker이용
-    path_dir = str(org_audio_path)  # 변환 대상이 될 ted영상의 경로
-    file_list = []
-    ted_id = int(start_transcript.split('_')[0])
-    start_point = int(start_transcript.split('_')[1])
-    end_point = int(end_transcript.split('_')[1])
-    for j in range(start_point, end_point + 1):
-        file_list.append(str(ted_id) + '_' + str(j))
+def synthesis_json(user_id,org_audio_path,start_transcript,end_transcript): # 음성 합성할 때 쓸 synthesis_list.json 변경
+    user_name=str(user_id) #user_id로 speaker이용
+    path_dir=str(org_audio_path) #변환 대상이 될 ted영상의 경로
+    file_list=[]
+    ted_id=int(start_transcript.split('_')[0])
+    start_point=int(start_transcript.split('_')[1])
+    end_point=int(end_transcript.split('_')[1])
+    for j in range(start_point,end_point+1):
+        file_list.append(str(ted_id)+'_'+str(j))
+    #file_list.append(str(ted_id)+'_'+str(start_point))
+    filename = 'datasets/english/synthesis_list_'+str(user_id)+'.json'
 
-    filename = 'datasets/english/synthesis_list_' + str(user_id) + '.json'
     yml = bios.read('./config/convert.yaml')
     yml['synthesis_list'] = filename
 
@@ -134,7 +135,9 @@ def synthesis_json(user_id, org_audio_path, start_transcript, end_transcript):  
     f.write(str(synthesis))
     f.close()
 
+
     with open('./' + filename, 'w', encoding='utf-8') as make_file:
 
         json.dump(synthesis, make_file, indent="\t")  # 추가 완료
+
     print('synthesis success')
