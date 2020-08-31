@@ -40,7 +40,7 @@
 
 
 
-		## 학습방법
+## 학습방법
 
 1. xgboost : 추출된 특징들을 grid search(n_estimators, max_depth 조정)하여 모델 생성
 
@@ -48,7 +48,7 @@
 
 
 
-	## 	Vq-vae 학습 방법
+## Vq-vae 학습 방법
 
 ​	1. zerospeech 폴더로 경로 지정
 
@@ -58,7 +58,7 @@
 
 
 
-	## 	XGBoost 모델 생성 방법
+## XGBoost 모델 생성 방법
 
 ​	1.전처리, 학습: evaluate.train('모델명')
 
@@ -66,7 +66,7 @@
 
 
 
-## 	음성변환 Flow
+## 음성변환 Flow
 
  	1.102명의 원어민 목소리를 VQ-VAE모델에 학습
 
@@ -78,7 +78,7 @@
 
 
 
-   ##      참조
+##      참조
 
 * https://github.com/bshall/ZeroSpeech
 * https://github.com/Raman-Raje/voiceClassifier
