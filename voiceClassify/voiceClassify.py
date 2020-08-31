@@ -11,11 +11,11 @@ class VoiceClassify():
 
     """ The class for classifying voice samples. """
 
-    def __init__(self,modelname,user_audio_file):
-
-        # loading the model
-        with open("./model/clf-"+modelname+".pkl","rb") as f:
-            self.clf = load(f)
+    #def __init__(self,modelname,user_audio_file):
+    def __init__(self,user_audio_file):
+        
+        with open("./model/clf-xgboost.pkl","rb") as f:
+            self.clf=load(f)
         self.user_audio_file=user_audio_file
         
     @staticmethod
@@ -50,7 +50,7 @@ class VoiceClassify():
 #             paths = [os.path.realpath("./test/{}".format(name)) for name in flist ]
             
             result =[]
-            mfcc,  mel,  tonnetz,_ = extract_features(self.user_audio_file)
+            mfccs,  mel,  tonnetz,_ = extract_features(self.user_audio_file)
             re = np.hstack((normalize(mfccs),normalize(mel),normalize(tonnetz)))
             result.append(re)
              
