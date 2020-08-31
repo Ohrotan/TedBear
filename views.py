@@ -111,7 +111,6 @@ def history():
 
 def audio_upload(file, file_name):
     print("audio upload: ",os.getcwd())
-    file_name= "/home/ran/TedBear-Web/zerospeech"+file_name[1:]
     if os.path.isfile(file_name):
         os.remove(file_name)
     with open(file_name, 'wb') as audio:
