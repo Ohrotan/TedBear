@@ -24,8 +24,20 @@
                     <input class="custom-control-input" id="customSwitch1" type="checkbox">
                     <label class="custom-control-label" for="customSwitch1">내 목소리로 듣기</label>
                 </div>-->
-                <button class="btn-solid-reg big-btn" id="convert-btn" onclick="convert()">내 목소리로 듣기</button>
-
+                <div>
+                    <button class="btn-solid-reg big-btn" id="convert-btn" onclick="convert()">내 목소리로 듣기</button>
+                    <audio src="/static/result/1_77_0.wav" style="float: right" id="result_audio"></audio>
+                </div>
+                <div>
+                    <span id="prev-btn" onclick="moveSentence(false)">
+                        <img class="btn-img" src="/static/images/left.png">
+                           이전 문장
+                    </span>
+                    <span id="next-btn" onclick="moveSentence(true)">
+                        다음 문장
+                        <img class="btn-img" src="/static/images/right.png">
+                    </span>
+                </div>
             </div> <!-- end of col,Video -->
 
             <!-- Transcript -->
@@ -39,20 +51,17 @@
                 <p class="transcript-kr" id="sentence_kr">
                     {{ transcript[transcript_index].sentence_kr }}
                 </p>
-                <div class="row" style="margin-top: 2rem;">
-                    <span class="col-sm-4" id="replay-btn" onclick="replay()">
-                        <img class="video-btn" src="/static/images/replay.png">
-                    </span>
-                    <span class="col-sm-4 hide" id="stop-btn" onclick="pause()">
+                <div id="user-control" class="row" style="margin-top: 2rem;">
+                    <span class="col-sm-2 hide" id="stop-btn" onclick="pause()">
                         <img class="video-btn" src="/static/images/stop.png">
                     </span>
-                    <span class="col-sm-4" id="play-btn" onclick="play()">
+                    <span class="col-sm-2" id="play-btn" onclick="play()">
                         <img class="video-btn" src="/static/images/play.png">
                     </span>
-                    <span class="col-sm-4" id="rec-btn">
+                    <span class="col-sm-2" id="rec-btn">
                         <img class="video-btn" src="/static/images/mic.png">
                     </span>
-                    <span class="col-sm-4 hide" id="speak-btn">
+                    <span class="col-sm-2 hide" id="speak-btn">
                         <img class="video-btn" src="/static/images/speak.png">
                     </span>
                 </div>
@@ -61,20 +70,30 @@
                 </div>
                 <div id="formats">&nbsp;</div>
 
-                <ol id="recordingsList"></ol>
+                <ol id="recordingsList" style="list-style: none;">
 
-                <div>
-                    <span id="prev-btn" onclick="moveSentence(false)">
-                        <img class="btn-img" src="/static/images/left.png">
-                           이전 문장
-                    </span>
-                    <span id="next-btn" onclick="moveSentence(true)">
-                        다음 문장
-                        <img class="btn-img" src="/static/images/right.png">
-                    </span>
-                </div>
+
+                </ol>
+
+
             </div><!-- end of col,Transcript -->
-        </div> <!-- end of row -->
+
+        </div><!-- end of row -->
+        <div class="row" style="width:100%">
+                <div class="col-12">
+                    <h3 id="word_point">&nbsp;</h3>
+                    <table style="float: right">
+                        <tbody>
+                        <tr id="ted_words">
+                            <td></td>
+                        </tr>
+                        <tr id="user_words">
+                            <td></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
     </div> <!-- end of container -->
 </div> <!-- end of basic-3 -->
 <!-- end of main -->
@@ -85,16 +104,15 @@
 <script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
 <script src="/static/js/voice_record.js"></script>
 <script>
-    // 2. This code loads the IFrame Player API code asynchronously.
+
+    var converted = 'yet'
+    convert()
+
     var tag = document.createElement('script');
 
     tag.src = "https://www.youtube.com/iframe_api";
     var firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-    // 3. This function creates an <iframe> (and YouTube player)
-    //    after the API code downloads.
-
 
     var transcript_index = {{ transcript_index }};
 
@@ -116,24 +134,11 @@
             videoId: '{{ talks_info.yt_url }}',
             playerVars: {'autoplay': 0, 'controls': 0, 'loop': 1, 'modestbranding': 1, 'rel': 0},
             events: {
-                'onReady': onPlayerReady,
                 'onStateChange': onPlayerStateChange
             }
         });
 
     }
-
-    // 4. The API will call this function when the video player is ready.
-    function onPlayerReady(event) {
-        // seekToStart()
-        // repeat()
-        //event.target.playVideo();
-    }
-
-    // 5. The API calls this function when the player's state changes.
-    //    The function indicates that when playing a video (state=1),
-    //    the player should play for six seconds and then stop.
-
 
     function onPlayerStateChange(event) {
         if (event.data == YT.PlayerState.PLAYING && timer == false) {
@@ -172,6 +177,7 @@
     $("#rec-btn").on('click', function () {
         $("#speak-btn").removeClass("hide")
         $("#rec-btn").addClass("hide")
+
     });
     $("#speak-btn").on('click', function () {
         $("#rec-btn").removeClass("hide")
@@ -210,6 +216,8 @@
                 } else {
                     seekToStart()
                 }
+                removeResult()
+                convert()
 
 
             }
@@ -227,31 +235,42 @@
     }
 
     function convert() {
-        $("#convert-btn")[0].innerText = "변환 중..."
-        /**
-         var xhr = new XMLHttpRequest();
-         xhr.onload = function (e) {
+        if (converted != 'yet') {
+            return;
+        }
+        converted = 'doing'
+        $("#convert-btn")[0].innerText = "내 목소리로 변환 중..."
+
+
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function (e) {
             if (this.readyState === 4) {
                 console.log("Server returned: ", e.target.responseText);
-                sentence = e.target.responseText
-                sentence = JSON.parse(sentence)
-                console.log('{{ transcript[transcript_index] }}')
-                document.getElementById("sentence_en").textContent = sentence['sentence_en']
-                document.getElementById("sentence_kr").textContent = sentence['sentence_kr']
-                start_time = sentence['start_time'] + gap
-                duration = sentence['duration']
-                document.getElementById("transcript_index").value = ++transcript_index
-                document.getElementById("sentence_id").value = sentence['id']
 
-                seekToStart()
+                au = document.getElementById("result_audio")
+                au.src = e.target.responseText;
+                au.controls = true;
+                $("#convert-btn")[0].innerText = "내 목소리로 듣기"
+                converted = 'done'
             }
         };
-         var fd = new FormData();
-         fd.append("transcript_index", document.getElementById("transcript_index").value);
-         xhr.open("POST", "/convert", true);
-         xhr.send(fd);
+        var fd = new FormData();
+        fd.append("talks_id", document.getElementById("talks_id").value);
+        fd.append("transcript_index", document.getElementById("transcript_index").value);
 
-         }
-         **/
+        xhr.open("POST", "/convert", true);
+        xhr.send(fd);
+
+
+    }
+
+    function removeResult(){
+        converted = 'yet'
+        document.getElementById("result_audio").controls =false
+        document.getElementById("user_audio").remove()
+        document.getElementById("recordingsList").innerHTML=''
+        document.getElementById("ted_words").innerHTML='<td></td>'
+        document.getElementById("user_words").innerHTML='<td></td>'
+        console.log(document.getElementById("user_words"))
     }
 </script>
