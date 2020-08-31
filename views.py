@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 """
 Routes and views for the flask application.
 """
@@ -304,3 +305,4 @@ def register():
     return render_template(
         'about.html'
     )
+
