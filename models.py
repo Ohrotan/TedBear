@@ -58,9 +58,10 @@ class Sentence(Base):
     duration = Column(Float)
     audio = Column(String(50))
     sentence_en = Column(String(50))
+    sentence_kr = Column(String(50))
 
     def __init__(self, id=None, talks_id=None, start_time=None, end_time=None, \
-                 duration=None, audio=None, sentence_en=None):
+                 duration=None, audio=None, sentence_en=None, sentence_kr=None):
         self.id = id
         self.talks_id = talks_id
         self.start_time = start_time
@@ -68,6 +69,7 @@ class Sentence(Base):
         self.duration = duration
         self.audio = audio
         self.sentence_en = sentence_en
+        self.sentence_kr = sentence_kr
 
     def __repr__(self):
         return '<Sentence %s, %s, %s>' % (self.id, self.talks_id, self.sentence_en)

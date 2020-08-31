@@ -14,7 +14,7 @@ import asyncio
 from zerospeech import convert
 from zerospeech import editconfig
 from evalspeech import evaluate
-# from zerospeech import preprocess
+from zerospeech import preprocess
 from zerospeech import train
 from googletrans import Translator
 
@@ -24,6 +24,7 @@ def get_converted_audio(user_id, user_audio_path, org_audio_path, start_transcri
     editconfig.train_json(user_audio_path)
     editconfig.test_json(org_audio_path)
     editconfig.synthesis_json(user_id, org_audio_path, start_transcript, end_transcript)
+    convert.modelname(user_id)
     convert.convert()
     hydra._internal.hydra.GlobalHydra().clear()
 
@@ -33,7 +34,8 @@ def get_converted_audio(user_id, user_audio_path, org_audio_path, start_transcri
 def home():
     session['id'] = 1
     session['name'] = 'dev-test'
-    has_transcript_id = "SELECT distinct(talks_id) FROM sentence"
+    has_transcript_id = "SELECT distinct(talks_id) FROM sentence ORDER BY talks_id"
+
     sql_query = "SELECT * FROM talks WHERE id in " + has_transcript_id
     valid_talks_id = app.database.execute(has_transcript_id).fetchall()
 
@@ -106,6 +108,10 @@ def history():
 
 
 def audio_upload(file, file_name):
+    print("audio upload: ",os.getcwd())
+    file_name= "/home/ran/TedBear-Web/zerospeech"+file_name[1:]
+    if os.path.isfile(file_name):
+        os.remove(file_name)
     with open(file_name, 'wb') as audio:
         file.save(audio)
     if os.path.isfile(file_name):
@@ -167,14 +173,13 @@ def eval(result=None):
     return speed + "+++" + strength + "+++" + pitch + "+++" + word_point + "+++" + sentence + "+++" + tot_point + "+++" + file_id
 
 
-@app.route('/shadowing/<talks_id>')
-def shadowing(talks_id):
+@app.route('/shadowing/<talks_id>/<transcript_index>')
+def shadowing(talks_id, transcript_index):
     # talks 정보 가져오기
     talks_info = Talks.query.filter(Talks.id == talks_id).first()
     global transcript
     transcript = Sentence.query.filter_by(talks_id=talks_id).all()
-    transcript_index = 0
-
+    transcript_index = int(transcript_index)
     # 사용자 히스토리 기록
     try:
         if session['id'] is None or len(transcript) == 0:
@@ -191,11 +196,14 @@ def shadowing(talks_id):
         db_session.commit()
 
     else:
+        print('')
         # 봤던거면 마지막 센텐스 위치찾기
-        transcript_index = ShadowingRecord.query.filter_by(user_id=session['id'], talks_id=talks_id).count()
+        #transcript_index = ShadowingRecord.query.filter_by(user_id=session['id'], talks_id=talks_id).count()
 
     if talks_info.youtube_gap is None:
         talks_info.youtube_gap = 0
+    transcript[transcript_index].sentence_kr = Translator().translate(str(transcript[transcript_index].sentence_en),
+                                                                      dest='ko').text
 
     return render_template(
         'shadowing.html',
@@ -245,16 +253,23 @@ def record():
 @app.route('/convert', methods=['POST'])
 def req_convert():
     # 사용자 목소리로 컨버트 시키기 비동기처리하기
+    filename = "/static/result/" + str(session['id']) + "_" + request.form['talks_id'] + '_' + \
+               request.form['transcript_index'] + ".wav"
+    if os.path.isfile(".." + filename):
+        return filename
     get_converted_audio(str(session['id']), './english/train/voice/', './english/test/',
                         request.form['talks_id'] + '_' + request.form['transcript_index'],
                         request.form['talks_id'] + '_' + request.form['transcript_index'])
-    return "/zerospeech/result/" + str(session['id']) + "_" + request.form['talks_id'] + '_' + \
-           request.form['transcript_index'] + ".wav"
+    return filename
 
 
 @app.route('/train', methods=['POST'])
 def req_train():
+    editconfig.train_json('./english/train/voice/', session['id'])
+    preprocess.userid(session['id'])
+    preprocess.preprocess_dataset()
     train.train_model()
+
 
 @app.route('/logout')
 def logout():

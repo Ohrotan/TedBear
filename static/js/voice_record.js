@@ -129,7 +129,7 @@ function createDownloadLink(blob) {
 
     var filename = new Date().toISOString();
 
-
+    au.id = 'user_audio'
     au.controls = true;
     au.src = url;
 
@@ -150,8 +150,13 @@ function createDownloadLink(blob) {
         return;
     }
     preAudio = document.getElementsByTagName('audio')
+    /*
     if (preAudio.length > 0) {
-        preAudio.item(0).remove()
+        if(preAudio.item(0).id == "result_audio" &&preAudio.length == 2){
+            preAudio.item(1).remove()
+        }else{
+            preAudio.item(0).remove()
+        }
         for (i in recordingsList.children) {
             recordingsList.children.item(i).remove()
         }
@@ -162,6 +167,7 @@ function createDownloadLink(blob) {
             user.children.item(i).remove()
         }
     }
+     */
 //add the new audio element to li
     usercontrol = document.getElementById("user-control")
     usercontrol.appendChild(au);

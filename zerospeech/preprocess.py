@@ -66,6 +66,9 @@ def process_wav(wav_path, out_path, sr=160000, preemph=0.97, n_fft=2048, n_mels=
     np.save(out_path.with_suffix(".mel.npy"), logmel)
     return out_path, logmel.shape[-1]
 
+def userid(name):
+    global user_id
+    user_id = name
 
 @hydra.main(config_path="zerospeech/config/preprocessing.yaml")
 # 기본 경로를 야믈형식으로 저장해뒀다. 이걸로 바로 해당 파일로 접근. 여기서 in_dir이 ??? 로 되어있음
@@ -73,7 +76,8 @@ def process_wav(wav_path, out_path, sr=160000, preemph=0.97, n_fft=2048, n_mels=
 def preprocess_dataset(cfg):
     print("in_dir:",cfg.in_dir)
     in_dir = Path(utils.to_absolute_path(cfg.in_dir)) # Path로 경로를 지정(객체로 지정).
-    
+
+
     #utils.to_absolute_path는 경로를 절대 경로(프로그램이 실행되는 최상단, 여기선 zerospeech폴더부터 표현하는 것)로 변경.
     # config/dataset/2019/english 안에있는 in_dir변수를 경로로 만든다.
     out_dir = Path(utils.to_absolute_path("datasets")) 
@@ -82,7 +86,7 @@ def preprocess_dataset(cfg):
     #  Create a new directory at this given path.
     executor = ProcessPoolExecutor(max_workers=cpu_count())
     # 병렬작업 실행자
-    for split in ["train","test"]: 
+    for split in ["train"]:
         print("Extracting features for {} set".format(split)) 
         futures = []
         split_path = out_dir / cfg.dataset.language / split # 위에서 정해진 out_dir 하위에 train과 test가 차례로 split_path가 됨, cfg.dataset.language는 config/preprocessing.yaml 안에 dataset: 2019/english라고 되어있는데 이 부분은 config/dataset/2019/english.yaml 파일로 연결됨, 이안에 language 변수 있음

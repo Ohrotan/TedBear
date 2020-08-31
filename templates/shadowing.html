@@ -24,7 +24,10 @@
                     <input class="custom-control-input" id="customSwitch1" type="checkbox">
                     <label class="custom-control-label" for="customSwitch1">내 목소리로 듣기</label>
                 </div>-->
-                <button class="btn-solid-reg big-btn" id="convert-btn" onclick="convert()">내 목소리로 듣기</button>
+                <div>
+                    <button class="btn-solid-reg big-btn" id="convert-btn" onclick="convert()">내 목소리로 듣기</button>
+                    <audio src="/static/result/1_77_0.wav" style="float: right" id="result_audio"></audio>
+                </div>
                 <div>
                     <span id="prev-btn" onclick="moveSentence(false)">
                         <img class="btn-img" src="/static/images/left.png">
@@ -74,7 +77,9 @@
 
 
             </div><!-- end of col,Transcript -->
-            <div class="row" style="width:100%">
+
+        </div><!-- end of row -->
+        <div class="row" style="width:100%">
                 <div class="col-12">
                     <h3 id="word_point">&nbsp;</h3>
                     <table style="float: right">
@@ -89,7 +94,6 @@
                     </table>
                 </div>
             </div>
-        </div><!-- end of row -->
     </div> <!-- end of container -->
 </div> <!-- end of basic-3 -->
 <!-- end of main -->
@@ -173,6 +177,7 @@
     $("#rec-btn").on('click', function () {
         $("#speak-btn").removeClass("hide")
         $("#rec-btn").addClass("hide")
+
     });
     $("#speak-btn").on('click', function () {
         $("#rec-btn").removeClass("hide")
@@ -211,6 +216,8 @@
                 } else {
                     seekToStart()
                 }
+                removeResult()
+                convert()
 
 
             }
@@ -240,10 +247,9 @@
             if (this.readyState === 4) {
                 console.log("Server returned: ", e.target.responseText);
 
-                var au = document.createElement('audio');
-                au.controls = true;
+                au = document.getElementById("result_audio")
                 au.src = e.target.responseText;
-                document.getElementById("convert-btn").append(au)
+                au.controls = true;
                 $("#convert-btn")[0].innerText = "내 목소리로 듣기"
                 converted = 'done'
             }
@@ -256,5 +262,15 @@
         xhr.send(fd);
 
 
+    }
+
+    function removeResult(){
+        converted = 'yet'
+        document.getElementById("result_audio").controls =false
+        document.getElementById("user_audio").remove()
+        document.getElementById("recordingsList").innerHTML=''
+        document.getElementById("ted_words").innerHTML='<td></td>'
+        document.getElementById("user_words").innerHTML='<td></td>'
+        console.log(document.getElementById("user_words"))
     }
 </script>

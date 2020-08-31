@@ -16,6 +16,10 @@ from zerospeech.model import Encoder, Decoder
 #from zerospeech import dataset.SpeechDataset as SpeechDataset
 #from zerospeech import model.Encoder as Encoder, model.Decoder as Decoder
 
+def modelname(name='default'):
+    global user_id
+    user_id = name
+
 # training 중간과정을 기록함, 중단되어도 다시 그 지점부터 시작할 수 있도록
 def save_checkpoint(encoder, decoder, optimizer, scheduler, step, checkpoint_dir):
     checkpoint_state = {
@@ -34,6 +38,7 @@ def save_checkpoint(encoder, decoder, optimizer, scheduler, step, checkpoint_dir
 
 @hydra.main(config_path="/zerospeech/config/train.yaml")
 def train_model(cfg): # 위의 confg_path의 파일의 모든 값이 cfg로 함수의 인자로 들어오는 것
+    cfg.checkpoint_dir = "checkpoints"
     tensorboard_path = Path(utils.to_absolute_path("tensorboard")) / cfg.checkpoint_dir
     checkpoint_dir = Path(utils.to_absolute_path(cfg.checkpoint_dir)) # chekpoint dir 지정
     writer = SummaryWriter(tensorboard_path)
