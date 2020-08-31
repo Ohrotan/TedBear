@@ -20,3 +20,9 @@ pyloudnorm==0.1.0
 tensorboard==2.3.0
 importlib==1.0.4
 googletrans==3.0.0
+bios==0.1.2
+pandas==1.1.1
+matplotlib==3.3.1
+SpeechRecognition==3.8.1
+nltk==3.5
+pysptk==0.1.18
