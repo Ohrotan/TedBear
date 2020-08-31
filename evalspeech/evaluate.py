@@ -844,10 +844,26 @@ def eval_total(speed_result, strength_result, pitch_result, pronounciation_resul
 def eval(ted_audio_path, user_audio_path, png_save_path):
     first_local_maximum_you, first_local_maximum_ted, df, df1 = preprocess(ted_audio_path, user_audio_path,
                                                                            png_save_path)
-    speed = list(eval_speed(first_local_maximum_ted, first_local_maximum_you, df, df1))
-    strength = list(eval_strength(first_local_maximum_ted, first_local_maximum_you, df, df1, png_save_path))
-    pitch = list(eval_pitch(ted_audio_path, user_audio_path, png_save_path))
-    words = list(eval_pronounciation(ted_audio_path, user_audio_path))
+    speed =''
+    strength=''
+    pitch=''
+    words=''
+    try:
+        speed = list(eval_speed(first_local_maximum_ted, first_local_maximum_you, df, df1))
+    except Exception as e:
+        print("speed{}".format(e))
+    try:
+        strength = list(eval_strength(first_local_maximum_ted, first_local_maximum_you, df, df1, png_save_path))
+    except Exception as e:
+        print("strength{}".format(e))
+    try:
+        pitch = list(eval_pitch(ted_audio_path, user_audio_path, png_save_path))
+    except Exception as e:
+        print("pitch{}".format(e))
+    try:
+        words = list(eval_pronounciation(ted_audio_path, user_audio_path))
+    except Exception as e:
+        print("words{}".format(e))
 
     speed_score = speed[1]
     if speed[1] > 100:
